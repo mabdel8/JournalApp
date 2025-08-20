@@ -21,6 +21,7 @@ struct JournalHomeView: View {
     @State private var hasUnsavedChanges = false
     @State private var currentViewDate = Date() // Track which day we're viewing
     @State private var isViewingToday = true
+    @State private var isPreviousAnswerExpanded = false // For expandable previous answers
     @FocusState private var isTextEditorFocused: Bool
     
     // Journal colors for handwritten feel
@@ -34,6 +35,11 @@ struct JournalHomeView: View {
             return false
         }
         return Calendar.current.isDate(currentViewDate, inSameDayAs: startDate)
+    }
+    
+    // Check if there are previous journal entries
+    private var hasPreviousJournalEntries: Bool {
+        return questionManager.getPreviousJournaledDate(before: currentViewDate) != nil
     }
     
     var body: some View {
@@ -93,6 +99,22 @@ struct JournalHomeView: View {
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack(spacing: 15) {
+                        // Test button (remove in production)
+                        Menu {
+                            Button("Create Test Data") {
+                                questionManager.createTestDataForPreviousAnswers()
+                                // Force refresh to show the previous answer
+                                questionManager.fetchPreviousAnswer()
+                            }
+                            Button("Clear Test Data") {
+                                questionManager.clearTestData()
+                                questionManager.previousAnswer = nil
+                            }
+                        } label: {
+                            Image(systemName: "flask")
+                                .foregroundColor(accentColor.opacity(0.7))
+                        }
+                        
                         Button(action: { navigateToHistory = true }) {
                             Image(systemName: "book.pages")
                                 .foregroundColor(accentColor)
@@ -173,11 +195,11 @@ struct JournalHomeView: View {
             // Date with navigation
             HStack {
                 Button(action: previousDay) {
-                    Image(systemName: "chevron.left")
+                    Image(systemName: hasPreviousJournalEntries ? "chevron.left.2" : "chevron.left")
                         .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(isAtStartDate ? inkColor.opacity(0.3) : accentColor)
+                        .foregroundColor((isAtStartDate && !hasPreviousJournalEntries) ? inkColor.opacity(0.3) : accentColor)
                 }
-                .disabled(isAtStartDate)
+                .disabled(isAtStartDate && !hasPreviousJournalEntries)
                 
                 Spacer()
                 
@@ -240,36 +262,87 @@ struct JournalHomeView: View {
     }
     
     private func previousAnswerOnLines(entry: JournalEntry) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 8) {
+            // Header with better styling
             HStack {
-                Image(systemName: "clock.arrow.circlepath")
+                Image(systemName: "memories")
                     .foregroundColor(accentColor)
-                    .font(.system(size: 14))
+                    .font(.system(size: 16))
                 
-                Text("Your answer from last cycle")
-                    .font(.custom("Noteworthy-Light", size: 14))
-                    .foregroundColor(accentColor)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Previous Answer")
+                        .font(.custom("Noteworthy-Bold", size: 16))
+                        .foregroundColor(accentColor)
+                    
+                    Text(entry.date, format: .dateTime.month(.wide).day().year())
+                        .font(.custom("Noteworthy-Light", size: 12))
+                        .foregroundColor(inkColor.opacity(0.6))
+                }
                 
                 Spacer()
                 
-                Text(entry.date, format: .dateTime.month(.abbreviated).day())
-                    .font(.custom("Noteworthy-Light", size: 12))
-                    .foregroundColor(inkColor.opacity(0.6))
+                // Cycle indicator
+                Text("Cycle \(entry.cycleNumber)")
+                    .font(.custom("Noteworthy-Light", size: 11))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(accentColor.opacity(0.7))
+                    .cornerRadius(8)
             }
-            .padding(.leading, 10)
-            .padding(.bottom, 8)
+            .padding(.horizontal, 15)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.white.opacity(0.6))
+                    .shadow(color: inkColor.opacity(0.1), radius: 2, x: 1, y: 1)
+            )
             
-            // Previous answer text aligned above lines
-            Text(entry.answer)
-                .font(.custom("Noteworthy-Light", size: 18))
-                .foregroundColor(inkColor.opacity(0.6))
-                .lineSpacing(12) // 30pt line spacing - 18pt font = 12pt line spacing
-                .multilineTextAlignment(.leading)
-                .padding(.leading, 10)
-                .italic()
+            // Previous answer text with expandable option
+            VStack(alignment: .leading, spacing: 8) {
+                // Show truncated or full text based on expansion state
+                let characterLimit = 150
+                let shouldTruncate = entry.answer.count > characterLimit && !isPreviousAnswerExpanded
+                
+                Text(shouldTruncate ? String(entry.answer.prefix(characterLimit)) + "..." : entry.answer)
+                    .font(.custom("Noteworthy-Light", size: 17))
+                    .foregroundColor(inkColor.opacity(0.7))
+                    .lineSpacing(10)
+                    .multilineTextAlignment(.leading)
+                    .italic()
+                    .animation(.easeInOut(duration: 0.3), value: isPreviousAnswerExpanded)
+                
+                // Show expand/collapse button if text is long
+                if entry.answer.count > characterLimit {
+                    Button(action: {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            isPreviousAnswerExpanded.toggle()
+                        }
+                    }) {
+                        HStack(spacing: 4) {
+                            Text(isPreviousAnswerExpanded ? "See less" : "See more")
+                                .font(.custom("Noteworthy-Light", size: 14))
+                            Image(systemName: isPreviousAnswerExpanded ? "chevron.up" : "chevron.down")
+                                .font(.system(size: 12, weight: .medium))
+                        }
+                        .foregroundColor(accentColor)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
+            }
+            .padding(.horizontal, 15)
+            .padding(.vertical, 10)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(accentColor.opacity(0.05))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .strokeBorder(accentColor.opacity(0.2), lineWidth: 1)
+                    )
+            )
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.bottom, 30)
+        .padding(.bottom, 20)
     }
     
     private var answerOnLines: some View {
@@ -369,6 +442,9 @@ struct JournalHomeView: View {
     private func updateViewForCurrentDate() {
         isViewingToday = Calendar.current.isDateInToday(currentViewDate)
         
+        // Reset expanded state when changing dates
+        isPreviousAnswerExpanded = false
+        
         // Update question manager for the current date
         questionManager.updateQuestionForDate(currentViewDate)
         
@@ -405,24 +481,44 @@ struct JournalHomeView: View {
     }
     
     private func previousDay() {
-        let newDate = Calendar.current.date(byAdding: .day, value: -1, to: currentViewDate) ?? currentViewDate
-        
-        // Check if the new date is before the journal start date
-        if let startDate = UserDefaults.standard.object(forKey: "journalStartDate") as? Date {
-            if newDate >= startDate {
+        // Try to find the last journaled date before current view date
+        if let previousJournaledDate = questionManager.getPreviousJournaledDate(before: currentViewDate) {
+            // Navigate to the last journaled date
+            currentViewDate = previousJournaledDate
+        } else {
+            // If no previous journal entries, try going back one day (but respect start date)
+            let newDate = Calendar.current.date(byAdding: .day, value: -1, to: currentViewDate) ?? currentViewDate
+            
+            // Check if the new date is before the journal start date
+            if let startDate = UserDefaults.standard.object(forKey: "journalStartDate") as? Date {
+                if newDate >= startDate {
+                    currentViewDate = newDate
+                }
+            } else {
                 currentViewDate = newDate
             }
-            // If newDate is before startDate, don't navigate (stay on current date)
-        } else {
-            // If no start date is set, allow navigation
-            currentViewDate = newDate
         }
     }
     
     private func nextDay() {
-        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: currentViewDate) ?? currentViewDate
-        if tomorrow <= Date() {
-            currentViewDate = tomorrow
+        // First try to find the next journaled date
+        if let nextJournaledDate = questionManager.getNextJournaledDate(after: currentViewDate) {
+            // Only navigate if it's not in the future
+            if nextJournaledDate <= Date() {
+                currentViewDate = nextJournaledDate
+            } else {
+                // If next journaled date is in the future, go to tomorrow if it's not future
+                let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: currentViewDate) ?? currentViewDate
+                if tomorrow <= Date() {
+                    currentViewDate = tomorrow
+                }
+            }
+        } else {
+            // No future journal entries, just go to tomorrow if it's not future
+            let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: currentViewDate) ?? currentViewDate
+            if tomorrow <= Date() {
+                currentViewDate = tomorrow
+            }
         }
     }
     

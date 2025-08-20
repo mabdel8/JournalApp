@@ -87,10 +87,9 @@ class QuestionManager: ObservableObject {
         let questionIndex = (currentDayNumber - 1) % 30
         todaysQuestion = orderedQuestionsList[questionIndex]
         
-        // If we're past the first cycle, fetch the previous answer
-        if currentCycleNumber > 1 {
-            fetchPreviousAnswer()
-        }
+        // Always try to fetch previous answers for testing
+        // In production, you'd only do this if currentCycleNumber > 1
+        fetchPreviousAnswer()
     }
     
     func updateQuestionForDate(_ date: Date) {
@@ -119,13 +118,9 @@ class QuestionManager: ObservableObject {
         currentDayNumber = dayNumber
         currentCycleNumber = cycleNumber
         
-        // If we're past the first cycle, fetch the previous answer
-        if cycleNumber > 1 {
-            fetchPreviousAnswer()
-        } else {
-            // Clear previous answer if we're in cycle 1
-            previousAnswer = nil
-        }
+        // Always try to fetch previous answers for testing
+        // In production, you'd only do this if cycleNumber > 1
+        fetchPreviousAnswer()
     }
     
     func getDayNumber(for date: Date) -> Int {
@@ -156,20 +151,30 @@ class QuestionManager: ObservableObject {
     
     func fetchPreviousAnswer() {
         guard let context = modelContext,
-              let questionId = todaysQuestion?.id else { return }
+              let questionId = todaysQuestion?.id else { 
+            previousAnswer = nil
+            return 
+        }
         
+        // For testing, let's find any previous answer for this question
+        // In production, this would look for the previous cycle
         let descriptor = FetchDescriptor<JournalEntry>(
             predicate: #Predicate { entry in
-                entry.questionId == questionId && entry.cycleNumber == currentCycleNumber - 1
+                entry.questionId == questionId
             },
             sortBy: [SortDescriptor(\.date, order: .reverse)]
         )
         
         do {
             let entries = try context.fetch(descriptor)
-            previousAnswer = entries.first
+            // Get the most recent previous answer (not today's)
+            let today = Calendar.current.startOfDay(for: Date())
+            previousAnswer = entries.first { entry in
+                Calendar.current.startOfDay(for: entry.date) < today
+            }
         } catch {
             print("Error fetching previous answer: \(error)")
+            previousAnswer = nil
         }
     }
     
@@ -261,6 +266,50 @@ class QuestionManager: ObservableObject {
         } catch {
             print("Error calculating streak: \(error)")
             return 0
+        }
+    }
+    
+    func getPreviousJournaledDate(before date: Date) -> Date? {
+        guard let context = modelContext else { return nil }
+        
+        let calendar = Calendar.current
+        let startOfDate = calendar.startOfDay(for: date)
+        
+        let descriptor = FetchDescriptor<JournalEntry>(
+            predicate: #Predicate { entry in
+                entry.date < startOfDate
+            },
+            sortBy: [SortDescriptor(\.date, order: .reverse)]
+        )
+        
+        do {
+            let entries = try context.fetch(descriptor)
+            return entries.first?.date
+        } catch {
+            print("Error finding previous journaled date: \(error)")
+            return nil
+        }
+    }
+    
+    func getNextJournaledDate(after date: Date) -> Date? {
+        guard let context = modelContext else { return nil }
+        
+        let calendar = Calendar.current
+        let endOfDate = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: date))!
+        
+        let descriptor = FetchDescriptor<JournalEntry>(
+            predicate: #Predicate { entry in
+                entry.date >= endOfDate
+            },
+            sortBy: [SortDescriptor(\.date, order: .forward)]
+        )
+        
+        do {
+            let entries = try context.fetch(descriptor)
+            return entries.first?.date
+        } catch {
+            print("Error finding next journaled date: \(error)")
+            return nil
         }
     }
     
@@ -357,5 +406,64 @@ class QuestionManager: ObservableObject {
         userDefaults.removeObject(forKey: "editedQuestions")
         loadQuestionsFromFile()
         updateTodaysQuestion()
+    }
+    
+    // MARK: - Test Data (Remove this in production)
+    
+    func createTestDataForPreviousAnswers() {
+        guard let context = modelContext,
+              let firstQuestion = orderedQuestions.first else { return }
+        
+        let calendar = Calendar.current
+        let now = Date()
+        
+        // Create test entry from 30 days ago (cycle 1)
+        if let thirtyDaysAgo = calendar.date(byAdding: .day, value: -30, to: now) {
+            let testEntry1 = JournalEntry(
+                questionId: firstQuestion.id,
+                question: firstQuestion.text,
+                answer: "Today I smiled when I saw my cat playing in the sunlight. There's something so peaceful about watching animals just being themselves. It reminded me to find joy in simple moments.",
+                date: thirtyDaysAgo,
+                dayNumber: 1,
+                cycleNumber: 1
+            )
+            context.insert(testEntry1)
+        }
+        
+        // Create test entry from 60 days ago (cycle 2, if we pretend we're in cycle 3)
+        if let sixtyDaysAgo = calendar.date(byAdding: .day, value: -60, to: now) {
+            let testEntry2 = JournalEntry(
+                questionId: firstQuestion.id,
+                question: firstQuestion.text,
+                answer: "I smiled today when my friend sent me a funny meme that perfectly captured how I was feeling about Monday morning. It's amazing how shared humor can make you feel connected even when you're apart.",
+                date: sixtyDaysAgo,
+                dayNumber: 1,
+                cycleNumber: 1 // This should be cycle 2 in real usage
+            )
+            context.insert(testEntry2)
+        }
+        
+        do {
+            try context.save()
+            print("Test data created for previous answers feature")
+        } catch {
+            print("Error creating test data: \(error)")
+        }
+    }
+    
+    func clearTestData() {
+        guard let context = modelContext else { return }
+        
+        do {
+            // Delete all journal entries (for testing purposes)
+            let allEntries = try context.fetch(FetchDescriptor<JournalEntry>())
+            for entry in allEntries {
+                context.delete(entry)
+            }
+            try context.save()
+            print("Test data cleared")
+        } catch {
+            print("Error clearing test data: \(error)")
+        }
     }
 }
