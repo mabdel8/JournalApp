@@ -32,10 +32,8 @@ struct CalendarView: View {
             
             ScrollView {
                 VStack(spacing: 30) {
-                    // Streak counter (Premium feature)
-                    if storeManager.isSubscribed {
-                        streakView
-                    }
+                    // Streak counter (always shown, locked for non-premium)
+                    streakView
                     
                     // Month navigation
                     monthNavigationView
@@ -43,8 +41,8 @@ struct CalendarView: View {
                     // Calendar grid
                     calendarGridView
                     
-                    // Stats section
-                    statsView
+                    // Stats section - individual cards
+                    statsCardsView
                 }
                 .padding()
             }
@@ -65,28 +63,53 @@ struct CalendarView: View {
     
     private var streakView: some View {
         VStack(spacing: 10) {
-            HStack(spacing: 15) {
-                Image(systemName: "flame.fill")
-                    .font(.system(size: 30))
-                    .foregroundColor(.orange)
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("\(questionManager.getStreak())")
-                        .font(.custom("Noteworthy-Bold", size: 32))
-                        .foregroundColor(inkColor)
+            ZStack {
+                HStack(spacing: 15) {
+                    Image(systemName: "flame.fill")
+                        .font(.system(size: 30))
+                        .foregroundColor(.orange)
                     
-                    Text("day streak")
-                        .font(.custom("Noteworthy-Light", size: 14))
-                        .foregroundColor(inkColor.opacity(0.6))
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(storeManager.isSubscribed ? "\(questionManager.getStreak())" : "--")
+                            .font(.custom("Noteworthy-Bold", size: 32))
+                            .foregroundColor(inkColor)
+                        
+                        Text("day streak")
+                            .font(.custom("Noteworthy-Light", size: 14))
+                            .foregroundColor(inkColor.opacity(0.6))
+                    }
+                    
+                    Spacer()
+                    
+                    if !storeManager.isSubscribed {
+                        Image(systemName: "lock.fill")
+                            .font(.system(size: 24))
+                            .foregroundColor(accentColor.opacity(0.7))
+                    }
                 }
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.orange.opacity(0.1))
+                )
                 
-                Spacer()
+                // Lock overlay for non-subscribers
+                if !storeManager.isSubscribed {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.black.opacity(0.1))
+                        .overlay(
+                            VStack(spacing: 8) {
+                                Image(systemName: "lock.fill")
+                                    .font(.system(size: 20))
+                                    .foregroundColor(accentColor)
+                                
+                                Text("Premium Feature")
+                                    .font(.custom("Noteworthy-Light", size: 12))
+                                    .foregroundColor(accentColor)
+                            }
+                        )
+                }
             }
-            .padding()
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.orange.opacity(0.1))
-            )
         }
     }
     
@@ -152,39 +175,118 @@ struct CalendarView: View {
         )
     }
     
-    private var statsView: some View {
-        VStack(alignment: .leading, spacing: 15) {
+    private var statsCardsView: some View {
+        VStack(alignment: .leading, spacing: 16) {
             Text("This Month")
                 .font(.custom("Noteworthy-Bold", size: 18))
                 .foregroundColor(inkColor)
+                .padding(.horizontal)
             
-            HStack(spacing: 30) {
-                StatItem(
-                    icon: "book.fill",
-                    value: "\(journalEntries.count)",
-                    label: "Entries"
+            VStack(spacing: 12) {
+                // Entries card
+                HStack(spacing: 15) {
+                    Image(systemName: "book.fill")
+                        .font(.system(size: 24))
+                        .foregroundColor(accentColor)
+                        .frame(width: 40)
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("\(journalEntries.count)")
+                            .font(.custom("Noteworthy-Bold", size: 24))
+                            .foregroundColor(inkColor)
+                        
+                        Text("Entries this month")
+                            .font(.custom("Noteworthy-Light", size: 14))
+                            .foregroundColor(inkColor.opacity(0.6))
+                    }
+                    
+                    Spacer()
+                }
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.white.opacity(0.6))
+                        .shadow(color: inkColor.opacity(0.1), radius: 2, x: 0, y: 1)
                 )
                 
-                StatItem(
-                    icon: "percent",
-                    value: "\(Int((Double(journalEntries.count) / Double(getDaysPassedInMonth())) * 100))%",
-                    label: "Completion"
+                // Completion rate card
+                HStack(spacing: 15) {
+                    Image(systemName: "percent")
+                        .font(.system(size: 24))
+                        .foregroundColor(accentColor)
+                        .frame(width: 40)
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("\(Int((Double(journalEntries.count) / Double(getDaysPassedInMonth())) * 100))%")
+                            .font(.custom("Noteworthy-Bold", size: 24))
+                            .foregroundColor(inkColor)
+                        
+                        Text("Completion rate")
+                            .font(.custom("Noteworthy-Light", size: 14))
+                            .foregroundColor(inkColor.opacity(0.6))
+                    }
+                    
+                    Spacer()
+                }
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.white.opacity(0.6))
+                        .shadow(color: inkColor.opacity(0.1), radius: 2, x: 0, y: 1)
                 )
                 
-                if storeManager.isSubscribed {
-                    StatItem(
-                        icon: "star.fill",
-                        value: "\(getLongestStreakInMonth())",
-                        label: "Best Streak"
+                // Best streak card (premium feature)
+                ZStack {
+                    HStack(spacing: 15) {
+                        Image(systemName: "star.fill")
+                            .font(.system(size: 24))
+                            .foregroundColor(.orange)
+                            .frame(width: 40)
+                        
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(storeManager.isSubscribed ? "\(getLongestStreakInMonth())" : "--")
+                                .font(.custom("Noteworthy-Bold", size: 24))
+                                .foregroundColor(inkColor)
+                            
+                            Text("Best streak this month")
+                                .font(.custom("Noteworthy-Light", size: 14))
+                                .foregroundColor(inkColor.opacity(0.6))
+                        }
+                        
+                        Spacer()
+                        
+                        if !storeManager.isSubscribed {
+                            Image(systemName: "lock.fill")
+                                .font(.system(size: 20))
+                                .foregroundColor(accentColor.opacity(0.7))
+                        }
+                    }
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.white.opacity(0.6))
+                            .shadow(color: inkColor.opacity(0.1), radius: 2, x: 0, y: 1)
                     )
+                    
+                    // Lock overlay for non-subscribers
+                    if !storeManager.isSubscribed {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.black.opacity(0.1))
+                            .overlay(
+                                VStack(spacing: 8) {
+                                    Image(systemName: "lock.fill")
+                                        .font(.system(size: 16))
+                                        .foregroundColor(accentColor)
+                                    
+                                    Text("Premium")
+                                        .font(.custom("Noteworthy-Light", size: 10))
+                                        .foregroundColor(accentColor)
+                                }
+                            )
+                    }
                 }
             }
         }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(accentColor.opacity(0.05))
-        )
     }
     
     private func previousMonth() {

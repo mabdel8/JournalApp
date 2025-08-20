@@ -10,13 +10,19 @@ import SwiftUI
 struct OnboardingView: View {
     @Binding var hasCompletedOnboarding: Bool
     
+    let paperColor = Color(red: 0.98, green: 0.96, blue: 0.91)
+    let inkColor = Color(red: 0.2, green: 0.2, blue: 0.3)
+    let accentColor = Color(red: 0.4, green: 0.5, blue: 0.6)
+    
     var body: some View {
         VStack(spacing: 40) {
             Spacer()
             
-            Image(systemName: "book.fill")
-                .font(.system(size: 100))
-                .foregroundStyle(Color(red: 0.4, green: 0.5, blue: 0.6))
+            Image("applogo")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 100)
+                .cornerRadius(20)
             
             VStack(spacing: 20) {
                 Text("30-Day Reflection")
@@ -31,18 +37,29 @@ struct OnboardingView: View {
                     .padding(.horizontal, 40)
             }
             
+            Image("jointhousands")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 120)
+            
             Spacer()
             
             Button(action: {
                 hasCompletedOnboarding = true
             }) {
                 Text("Continue")
-                    .font(.headline)
-                    .foregroundStyle(.white)
+                    .font(.custom("Noteworthy-Bold", size: 16))
+                    .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.blue)
-                    .cornerRadius(12)
+                    .background(
+                        LinearGradient(
+                            gradient: Gradient(colors: [accentColor, accentColor.opacity(0.8)]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .cornerRadius(10)
             }
             .padding(.horizontal, 40)
             .padding(.bottom, 50)
@@ -50,3 +67,4 @@ struct OnboardingView: View {
         .background(Color(UIColor.systemBackground))
     }
 }
+

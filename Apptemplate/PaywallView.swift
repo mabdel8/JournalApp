@@ -16,6 +16,11 @@ struct PaywallView: View {
     @State private var selectedPlan: String = "template_weekly"
     @State private var testimonialTimer: Timer?
     
+    // Journal app theme colors
+    let paperColor = Color(red: 0.98, green: 0.96, blue: 0.91)
+    let inkColor = Color(red: 0.2, green: 0.2, blue: 0.3)
+    let accentColor = Color(red: 0.4, green: 0.5, blue: 0.6)
+    
     // MARK: - Constants
     private struct Constants {
         static let appIconSize: CGFloat = 80
@@ -26,22 +31,28 @@ struct PaywallView: View {
     }
     
     private let testimonials = [
-        Testimonial(text: "Love tracking my reading stats and competing with friends. Makes reading so much more fun!", author: "Emma L."),
-        Testimonial(text: "The AI-powered features help me discover books I never would have found otherwise.", author: "David M."),
-        Testimonial(text: "Finally hit my reading goals thanks to the smart reminders and progress tracking.", author: "Sarah K.")
+        Testimonial(text: "This journal has helped me build a consistent reflection habit. I love seeing my growth over the cycles!", author: "Emma L."),
+        Testimonial(text: "The 30-day cycle format keeps me engaged and motivated. Finally found a journaling app that works!", author: "David M."),
+        Testimonial(text: "Being able to see my previous answers really shows how much I've grown. It's incredibly powerful.", author: "Sarah K.")
     ]
     
     // MARK: - Body
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 32) {
-                    appIconSection
-                    featuresSection
-                    testimonialsSection
-                    subscriptionPlansSection
-                    purchaseButtonSection
-                    bottomLinksSection
+            ZStack {
+                paperColor
+                    .ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(spacing: 32) {
+                        appIconSection
+                        featuresSection
+                        testimonialsSection
+                        subscriptionPlansSection
+                        purchaseButtonSection
+                        bottomLinksSection
+                    }
+                    .padding(.horizontal, 20)
                 }
             }
             .toolbar {
@@ -49,7 +60,8 @@ struct PaywallView: View {
                     Button("Done") {
                         isPresented = false
                     }
-                    .foregroundStyle(.blue)
+                    .font(.custom("Noteworthy-Bold", size: 16))
+                    .foregroundColor(accentColor)
                 }
             }
             .onChange(of: storeManager.isSubscribed) { _, newValue in
@@ -75,11 +87,10 @@ struct PaywallView: View {
     
     private var featuresSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            FeatureRow(icon: "books.vertical.fill", text: "Unlimited Books")
-            FeatureRow(icon: "chart.line.uptrend.xyaxis", text: "Advanced Statistics")
-            FeatureRow(icon: "sparkles", text: "AI-Powered Features")
+            FeatureRow(icon: "lock.fill", text: "Passcode Protection", inkColor: inkColor, accentColor: accentColor)
+            FeatureRow(icon: "questionmark.diamond", text: "Edit & Customize Questions", inkColor: inkColor, accentColor: accentColor)
+            FeatureRow(icon: "memories", text: "See Previous Answers", inkColor: inkColor, accentColor: accentColor)
         }
-        .padding(.horizontal, 24)
     }
     
     private var testimonialsSection: some View {
@@ -97,7 +108,7 @@ struct PaywallView: View {
         HStack(spacing: 4) {
             ForEach(0..<5, id: \.self) { _ in
                 Image(systemName: "star.fill")
-                    .foregroundStyle(.yellow)
+                    .foregroundColor(accentColor)
                     .font(.caption)
             }
         }
@@ -108,13 +119,14 @@ struct PaywallView: View {
             ForEach(Array(testimonials.enumerated()), id: \.offset) { index, testimonial in
                 VStack(spacing: 8) {
                     Text("\"\(testimonial.text)\"")
-                        .font(.subheadline)
+                        .font(.custom("Noteworthy-Light", size: 16))
+                        .foregroundColor(inkColor)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 32)
                     
                     Text("— \(testimonial.author)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(.custom("Noteworthy-Light", size: 12))
+                        .foregroundColor(inkColor.opacity(0.6))
                 }
                 .tag(index)
             }
@@ -130,7 +142,7 @@ struct PaywallView: View {
         HStack(spacing: 8) {
             ForEach(0..<testimonials.count, id: \.self) { index in
                 Circle()
-                    .fill(index == currentTestimonial ? Color.purple : Color.gray.opacity(0.3))
+                    .fill(index == currentTestimonial ? accentColor : inkColor.opacity(0.3))
                     .frame(width: 8, height: 8)
             }
         }
@@ -144,17 +156,20 @@ struct PaywallView: View {
                 originalPrice: "$149",
                 badge: "BEST DEAL",
                 isSelected: selectedPlan == "template_lifetime",
-                onTap: { selectedPlan = "template_lifetime" }
+                onTap: { selectedPlan = "template_lifetime" },
+                inkColor: inkColor,
+                accentColor: accentColor
             )
             
             PlanCardView(
                 title: "3-Day Trial",
                 subtitle: "then $2.99 per week",
                 isSelected: selectedPlan == "template_weekly",
-                onTap: { selectedPlan = "template_weekly" }
+                onTap: { selectedPlan = "template_weekly" },
+                inkColor: inkColor,
+                accentColor: accentColor
             )
         }
-        .padding(.horizontal, 20)
     }
     
     private var purchaseButtonSection: some View {
@@ -167,47 +182,46 @@ struct PaywallView: View {
                 }
                 
                 Text(purchaseButtonText)
-                    .font(.headline)
-                    .foregroundStyle(.white)
+                    .font(.custom("Noteworthy-Bold", size: 18))
+                    .foregroundColor(.white)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
             .background(
                 LinearGradient(
-                    gradient: Gradient(colors: [Color.purple, Color.blue]),
+                    gradient: Gradient(colors: [accentColor, accentColor.opacity(0.8)]),
                     startPoint: .leading,
                     endPoint: .trailing
                 )
             )
             .cornerRadius(12)
         }
-        .padding(.horizontal, 20)
         .disabled(storeManager.purchaseState == .purchasing)
     }
     
     private var bottomLinksSection: some View {
         HStack(spacing: 16) {
             Button("Restore", action: restorePurchases)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
+                .font(.custom("Noteworthy-Light", size: 14))
+                .foregroundColor(inkColor.opacity(0.6))
             
             Text("•")
-                .foregroundStyle(.secondary)
+                .foregroundColor(inkColor.opacity(0.6))
             
             Button("Terms") {
                 // TODO: Handle terms action
             }
-            .font(.footnote)
-            .foregroundStyle(.secondary)
+            .font(.custom("Noteworthy-Light", size: 14))
+            .foregroundColor(inkColor.opacity(0.6))
             
             Text("•")
-                .foregroundStyle(.secondary)
+                .foregroundColor(inkColor.opacity(0.6))
             
             Button("Privacy") {
                 // TODO: Handle privacy action
             }
-            .font(.footnote)
-            .foregroundStyle(.secondary)
+            .font(.custom("Noteworthy-Light", size: 14))
+            .foregroundColor(inkColor.opacity(0.6))
         }
         .padding(.bottom, 20)
     }
@@ -250,17 +264,19 @@ struct PaywallView: View {
 struct FeatureRow: View {
     let icon: String
     let text: String
+    let inkColor: Color
+    let accentColor: Color
     
     var body: some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
-                .font(.title2)
-                .foregroundStyle(.purple)
+                .font(.system(size: 20, weight: .medium))
+                .foregroundColor(accentColor)
                 .frame(width: 28)
             
             Text(text)
-                .font(.headline)
-                .foregroundStyle(.primary)
+                .font(.custom("Noteworthy-Bold", size: 16))
+                .foregroundColor(inkColor)
         }
     }
 }
@@ -273,6 +289,8 @@ struct PlanCardView: View {
     var badge: String?
     let isSelected: Bool
     let onTap: () -> Void
+    let inkColor: Color
+    let accentColor: Color
     
     var body: some View {
         Button(action: onTap) {
@@ -282,8 +300,8 @@ struct PlanCardView: View {
                     
                     if let subtitle = subtitle {
                         Text(subtitle)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .font(.custom("Noteworthy-Light", size: 14))
+                            .foregroundColor(inkColor.opacity(0.6))
                     }
                     
                     if price != nil {
@@ -297,11 +315,11 @@ struct PlanCardView: View {
             }
             .padding(16)
             .frame(height: 80)
-            .background(Color(.systemBackground))
+            .background(Color.white.opacity(0.7))
             .cornerRadius(12)
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(isSelected ? Color.purple : Color.gray.opacity(0.2), lineWidth: isSelected ? 2 : 1)
+                    .stroke(isSelected ? accentColor : inkColor.opacity(0.2), lineWidth: isSelected ? 2 : 1)
             )
         }
         .buttonStyle(PlainButtonStyle())
@@ -310,8 +328,8 @@ struct PlanCardView: View {
     private var titleWithBadge: some View {
         HStack(spacing: 8) {
             Text(title)
-                .font(.headline)
-                .foregroundStyle(.primary)
+                .font(.custom("Noteworthy-Bold", size: 18))
+                .foregroundColor(inkColor)
             
             if let badge = badge {
                 Text(badge)
@@ -322,7 +340,7 @@ struct PlanCardView: View {
                     .padding(.vertical, 4)
                     .background(
                         LinearGradient(
-                            gradient: Gradient(colors: [Color.purple, Color.blue]),
+                            gradient: Gradient(colors: [accentColor, accentColor.opacity(0.8)]),
                             startPoint: .leading,
                             endPoint: .trailing
                         )
@@ -336,24 +354,23 @@ struct PlanCardView: View {
         HStack(spacing: 8) {
             if let originalPrice = originalPrice {
                 Text(originalPrice)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(.custom("Noteworthy-Light", size: 14))
+                    .foregroundColor(inkColor.opacity(0.6))
                     .strikethrough()
             }
             Text(price!)
-                .font(.headline)
-                .fontWeight(.bold)
-                .foregroundStyle(.primary)
+                .font(.custom("Noteworthy-Bold", size: 16))
+                .foregroundColor(inkColor)
         }
     }
     
     private var selectionIndicator: some View {
         Circle()
-            .fill(isSelected ? Color.purple : Color.clear)
+            .fill(isSelected ? accentColor : Color.clear)
             .frame(width: 24, height: 24)
             .overlay(
                 Circle()
-                    .stroke(isSelected ? Color.purple : Color.gray.opacity(0.3), lineWidth: 2)
+                    .stroke(isSelected ? accentColor : inkColor.opacity(0.3), lineWidth: 2)
             )
             .overlay(
                 Image(systemName: "checkmark")

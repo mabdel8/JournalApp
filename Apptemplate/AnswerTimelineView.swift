@@ -125,7 +125,7 @@ struct AnswerTimelineView: View {
                 .shadow(color: inkColor.opacity(0.1), radius: 2, x: 0, y: 1)
         )
         .padding(.horizontal, 20)
-        .padding(.top, 10)
+        .padding(.vertical, 10)
     }
     
     private func loadEntries() {
