@@ -13,7 +13,7 @@ struct SettingsView: View {
     @AppStorage("isPasscodeEnabled") private var isPasscodeEnabled = false
     @AppStorage("passcode") private var savedPasscode = ""
     @State private var showingPasscodeSetup = false
-    @State private var showingCustomQuestions = false
+    @State private var showingQuestionManager = false
     @State private var showingPaywall = false
     @State private var newPasscode = ""
     @State private var confirmPasscode = ""
@@ -55,18 +55,18 @@ struct SettingsView: View {
                             }
                         }
                         
-                        // Custom Questions
-                        Button(action: { showingCustomQuestions = true }) {
+                        // Question Management (30 questions only)
+                        Button(action: { showingQuestionManager = true }) {
                             Label {
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text("Custom Questions")
+                                    Text("Question Management")
                                         .font(.custom("Noteworthy-Bold", size: 16))
-                                    Text("Add your own reflection questions")
+                                    Text("Edit and reorder your 30 reflection questions")
                                         .font(.custom("Noteworthy-Light", size: 12))
                                         .foregroundColor(inkColor.opacity(0.6))
                                 }
                             } icon: {
-                                Image(systemName: "pencil.circle.fill")
+                                Image(systemName: "questionmark.diamond")
                                     .foregroundColor(accentColor)
                             }
                         }
@@ -80,7 +80,7 @@ struct SettingsView: View {
                             
                             VStack(alignment: .leading, spacing: 8) {
                                 SettingsFeatureRow(icon: "lock.fill", text: "Passcode Protection")
-                                SettingsFeatureRow(icon: "pencil.circle.fill", text: "Custom Questions")
+                                SettingsFeatureRow(icon: "questionmark.diamond", text: "Edit Questions")
                                 SettingsFeatureRow(icon: "flame.fill", text: "Streak Tracking")
                             }
                             
@@ -191,8 +191,8 @@ struct SettingsView: View {
                 savedPasscode: $savedPasscode
             )
         }
-        .sheet(isPresented: $showingCustomQuestions) {
-            CustomQuestionsView()
+        .sheet(isPresented: $showingQuestionManager) {
+            SimpleQuestionManagerView()
                 .environmentObject(storeManager)
         }
         .sheet(isPresented: $showingPaywall) {
@@ -313,87 +313,5 @@ struct PasscodeSetupView: View {
     }
 }
 
-struct CustomQuestionsView: View {
-    @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject var storeManager: StoreManager
-    @State private var customQuestions: [String] = UserDefaults.standard.stringArray(forKey: "customQuestions") ?? []
-    @State private var newQuestion = ""
-    @State private var showingAddQuestion = false
-    
-    let paperColor = Color(red: 0.98, green: 0.96, blue: 0.91)
-    let inkColor = Color(red: 0.2, green: 0.2, blue: 0.3)
-    let accentColor = Color(red: 0.4, green: 0.5, blue: 0.6)
-    
-    var body: some View {
-        NavigationStack {
-            ZStack {
-                paperColor
-                    .ignoresSafeArea()
-                
-                List {
-                    Section {
-                        if customQuestions.isEmpty {
-                            Text("No custom questions yet")
-                                .font(.custom("Noteworthy-Light", size: 16))
-                                .foregroundColor(inkColor.opacity(0.6))
-                                .padding(.vertical, 20)
-                        } else {
-                            ForEach(customQuestions, id: \.self) { question in
-                                Text(question)
-                                    .font(.custom("Noteworthy-Light", size: 16))
-                                    .foregroundColor(inkColor)
-                                    .padding(.vertical, 4)
-                            }
-                            .onDelete(perform: deleteQuestion)
-                        }
-                    } header: {
-                        Text("Your Custom Questions")
-                            .font(.custom("Noteworthy-Light", size: 14))
-                    }
-                    .listRowBackground(Color.white.opacity(0.5))
-                    
-                    Section {
-                        Button(action: { showingAddQuestion = true }) {
-                            Label("Add New Question", systemImage: "plus.circle.fill")
-                                .font(.custom("Noteworthy-Bold", size: 16))
-                                .foregroundColor(accentColor)
-                        }
-                    }
-                    .listRowBackground(Color.white.opacity(0.5))
-                }
-                .listStyle(.insetGrouped)
-                .scrollContentBackground(.hidden)
-            }
-            .navigationTitle("Custom Questions")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
-                        dismiss()
-                    }
-                }
-            }
-            .alert("Add Custom Question", isPresented: $showingAddQuestion) {
-                TextField("Enter your question", text: $newQuestion)
-                    .textInputAutocapitalization(.sentences)
-                
-                Button("Cancel", role: .cancel) {
-                    newQuestion = ""
-                }
-                
-                Button("Add") {
-                    if !newQuestion.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        customQuestions.append(newQuestion)
-                        UserDefaults.standard.set(customQuestions, forKey: "customQuestions")
-                        newQuestion = ""
-                    }
-                }
-            }
-        }
-    }
-    
-    private func deleteQuestion(at offsets: IndexSet) {
-        customQuestions.remove(atOffsets: offsets)
-        UserDefaults.standard.set(customQuestions, forKey: "customQuestions")
-    }
-}
+// Removed CustomQuestionsView and related components since we're using
+// SimpleQuestionManagerView with exactly 30 editable questions only

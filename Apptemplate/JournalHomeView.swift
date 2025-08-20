@@ -16,11 +16,25 @@ struct JournalHomeView: View {
     @State private var showingSaved = false
     @State private var navigateToCalendar = false
     @State private var navigateToSettings = false
+    @State private var navigateToHistory = false
+    @State private var autoSaveTimer: Timer?
+    @State private var hasUnsavedChanges = false
+    @State private var currentViewDate = Date() // Track which day we're viewing
+    @State private var isViewingToday = true
+    @FocusState private var isTextEditorFocused: Bool
     
     // Journal colors for handwritten feel
     let paperColor = Color(red: 0.98, green: 0.96, blue: 0.91)
     let inkColor = Color(red: 0.2, green: 0.2, blue: 0.3)
     let accentColor = Color(red: 0.4, green: 0.5, blue: 0.6)
+    
+    // Check if we're at the journal start date (can't go back further)
+    private var isAtStartDate: Bool {
+        guard let startDate = UserDefaults.standard.object(forKey: "journalStartDate") as? Date else {
+            return false
+        }
+        return Calendar.current.isDate(currentViewDate, inSameDayAs: startDate)
+    }
     
     var body: some View {
         NavigationStack {
@@ -54,13 +68,13 @@ struct JournalHomeView: View {
                             // Answer input area on lines
                             answerOnLines
                             
-                            // Save button
-                            if !questionManager.hasJournaledToday() {
-                                saveButton
-                                    .padding(.top, 30)
-                            } else {
-                                completedTodayView
-                                    .padding(.top, 30)
+                            // Auto-save indicator
+                            if hasUnsavedChanges {
+                                savingIndicator
+                                    .padding(.top, 10)
+                            } else if !answer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                savedIndicator
+                                    .padding(.top, 10)
                             }
                             
                             Spacer(minLength: 200) // Extra space for writing
@@ -79,6 +93,11 @@ struct JournalHomeView: View {
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack(spacing: 15) {
+                        Button(action: { navigateToHistory = true }) {
+                            Image(systemName: "book.pages")
+                                .foregroundColor(accentColor)
+                        }
+                        
                         Button(action: { navigateToCalendar = true }) {
                             Image(systemName: "calendar")
                                 .foregroundColor(accentColor)
@@ -90,6 +109,16 @@ struct JournalHomeView: View {
                         }
                     }
                 }
+                
+                // Done button for keyboard
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") {
+                        isTextEditorFocused = false
+                    }
+                    .font(.custom("Noteworthy-Bold", size: 16))
+                    .foregroundColor(accentColor)
+                }
             }
             .navigationDestination(isPresented: $navigateToCalendar) {
                 CalendarView()
@@ -99,11 +128,25 @@ struct JournalHomeView: View {
                 SettingsView()
                     .environmentObject(storeManager)
             }
+            .navigationDestination(isPresented: $navigateToHistory) {
+                JournalHistoryView()
+                    .environmentObject(storeManager)
+            }
         }
         .onAppear {
             questionManager.modelContext = modelContext
             questionManager.calculateCurrentDay()
-            loadTodaysEntry()
+            updateViewForCurrentDate()
+        }
+        .onChange(of: currentViewDate) { _, _ in
+            updateViewForCurrentDate()
+        }
+        .onDisappear {
+            // Save any unsaved changes when leaving the view
+            autoSaveTimer?.invalidate()
+            if hasUnsavedChanges {
+                autoSaveEntry()
+            }
         }
     }
     
@@ -127,20 +170,43 @@ struct JournalHomeView: View {
     
     private var headerView: some View {
         VStack(spacing: 8) {
-            Text(Date(), format: .dateTime.weekday(.wide).month(.wide).day())
-                .font(.custom("Noteworthy-Light", size: 18))
-                .foregroundColor(inkColor.opacity(0.8))
+            // Date with navigation
+            HStack {
+                Button(action: previousDay) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(isAtStartDate ? inkColor.opacity(0.3) : accentColor)
+                }
+                .disabled(isAtStartDate)
+                
+                Spacer()
+                
+                Text(currentViewDate, format: .dateTime.weekday(.wide).month(.wide).day())
+                    .font(.custom("Noteworthy-Light", size: 18))
+                    .foregroundColor(inkColor.opacity(0.8))
+                
+                Spacer()
+                
+                Button(action: nextDay) {
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(isViewingToday ? inkColor.opacity(0.3) : accentColor)
+                }
+                .disabled(isViewingToday)
+            }
+            .padding(.horizontal)
             
             HStack(spacing: 5) {
                 Text("Day")
                     .font(.custom("Noteworthy-Light", size: 16))
-                Text("\(questionManager.currentDayNumber)")
+                Text("\(getDayNumber(for: currentViewDate))")
                     .font(.custom("Noteworthy-Bold", size: 20))
                 Text("of 30")
                     .font(.custom("Noteworthy-Light", size: 16))
                 
-                if questionManager.currentCycleNumber > 1 {
-                    Text("• Cycle \(questionManager.currentCycleNumber)")
+                let cycleNumber = getCycleNumber(for: currentViewDate)
+                if cycleNumber > 1 {
+                    Text("• Cycle \(cycleNumber)")
                         .font(.custom("Noteworthy-Light", size: 14))
                         .foregroundColor(accentColor)
                 }
@@ -236,73 +302,89 @@ struct JournalHomeView: View {
                     .frame(minHeight: 210) // 7 lines × 30pt = 210pt
                     .padding(.leading, 10)
                     .padding(.trailing, 10)
-                    .disabled(questionManager.hasJournaledToday())
+                    .focused($isTextEditorFocused)
+                    .onTapGesture {
+                        // Prevent unwanted scrolling when tapping
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            isTextEditorFocused = true
+                        }
+                    }
+                    .onChange(of: answer) { _, newValue in
+                        // Only auto-save if viewing today
+                        if isViewingToday {
+                            hasUnsavedChanges = true
+                            autoSaveTimer?.invalidate()
+                            autoSaveTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { _ in
+                                autoSaveEntry()
+                            }
+                        }
+                    }
+                    .disabled(!isViewingToday) // Disable editing for past days
             }
         }
         .padding(.top, 16)
         .padding(.bottom, 30)
     }
     
-    private var saveButton: some View {
-        Button(action: saveEntry) {
-            HStack {
-                Image(systemName: "square.and.pencil")
-                Text("Save Entry")
-                    .font(.custom("Noteworthy-Bold", size: 18))
-            }
-            .foregroundColor(.white)
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(
-                LinearGradient(
-                    gradient: Gradient(colors: [accentColor, accentColor.opacity(0.8)]),
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-            )
-            .cornerRadius(12)
-        }
-        .disabled(answer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-    }
-    
-    private var completedTodayView: some View {
-        VStack(spacing: 10) {
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 40))
-                .foregroundColor(.green)
+    private var savingIndicator: some View {
+        HStack {
+            ProgressView()
+                .scaleEffect(0.8)
+                .progressViewStyle(CircularProgressViewStyle(tint: accentColor))
             
-            Text("Today's entry saved!")
-                .font(.custom("Noteworthy-Bold", size: 18))
-                .foregroundColor(inkColor)
-            
-            Text("Come back tomorrow for your next reflection")
+            Text("Saving...")
                 .font(.custom("Noteworthy-Light", size: 14))
-                .foregroundColor(inkColor.opacity(0.6))
+                .foregroundColor(accentColor)
         }
-        .padding()
+        .padding(.horizontal)
     }
     
-    private func saveEntry() {
-        guard !answer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-        
-        questionManager.saveEntry(answer: answer)
-        
-        withAnimation {
-            showingSaved = true
+    private var savedIndicator: some View {
+        HStack {
+            Image(systemName: "checkmark.circle.fill")
+                .foregroundColor(.green)
+                .font(.system(size: 16))
+            
+            Text("Saved")
+                .font(.custom("Noteworthy-Light", size: 14))
+                .foregroundColor(.green)
         }
-        
-        // Clear the answer field after saving
-        answer = ""
+        .padding(.horizontal)
     }
     
-    private func loadTodaysEntry() {
-        guard let questionId = questionManager.todaysQuestion?.id else { return }
+    
+    private func autoSaveEntry() {
+        let trimmedAnswer = answer.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Only save if there's content
+        if !trimmedAnswer.isEmpty {
+            questionManager.saveEntry(answer: trimmedAnswer)
+        }
+        
+        withAnimation(.easeInOut(duration: 0.3)) {
+            hasUnsavedChanges = false
+        }
+    }
+    
+    private func updateViewForCurrentDate() {
+        isViewingToday = Calendar.current.isDateInToday(currentViewDate)
+        
+        // Update question manager for the current date
+        questionManager.updateQuestionForDate(currentViewDate)
+        
+        // Load entry for the current date
+        loadEntryForDate(currentViewDate)
+    }
+    
+    private func loadEntryForDate(_ date: Date) {
+        guard let questionId = questionManager.todaysQuestion?.id else { 
+            answer = ""
+            return 
+        }
         
         let context = modelContext
-        
-        let today = Date()
         let calendar = Calendar.current
-        let startOfDay = calendar.startOfDay(for: today)
+        let startOfDay = calendar.startOfDay(for: date)
         let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
         
         let descriptor = FetchDescriptor<JournalEntry>(
@@ -315,11 +397,40 @@ struct JournalHomeView: View {
         
         do {
             let entries = try context.fetch(descriptor)
-            if let todaysEntry = entries.first {
-                answer = todaysEntry.answer
-            }
+            answer = entries.first?.answer ?? ""
         } catch {
-            print("Error loading today's entry: \(error)")
+            print("Error loading entry for date: \(error)")
+            answer = ""
         }
+    }
+    
+    private func previousDay() {
+        let newDate = Calendar.current.date(byAdding: .day, value: -1, to: currentViewDate) ?? currentViewDate
+        
+        // Check if the new date is before the journal start date
+        if let startDate = UserDefaults.standard.object(forKey: "journalStartDate") as? Date {
+            if newDate >= startDate {
+                currentViewDate = newDate
+            }
+            // If newDate is before startDate, don't navigate (stay on current date)
+        } else {
+            // If no start date is set, allow navigation
+            currentViewDate = newDate
+        }
+    }
+    
+    private func nextDay() {
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: currentViewDate) ?? currentViewDate
+        if tomorrow <= Date() {
+            currentViewDate = tomorrow
+        }
+    }
+    
+    private func getDayNumber(for date: Date) -> Int {
+        return questionManager.getDayNumber(for: date)
+    }
+    
+    private func getCycleNumber(for date: Date) -> Int {
+        return questionManager.getCycleNumber(for: date)
     }
 }
