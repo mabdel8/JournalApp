@@ -14,19 +14,20 @@ struct OnboardingView: View {
         VStack(spacing: 40) {
             Spacer()
             
-            Image(systemName: "star.fill")
+            Image(systemName: "book.fill")
                 .font(.system(size: 100))
-                .foregroundStyle(.yellow)
+                .foregroundStyle(Color(red: 0.4, green: 0.5, blue: 0.6))
             
             VStack(spacing: 20) {
-                Text("Welcome to App")
-                    .font(.largeTitle)
+                Text("30-Day Reflection")
+                    .font(.custom("Noteworthy-Bold", size: 32))
                     .fontWeight(.bold)
+                    .foregroundColor(Color(red: 0.2, green: 0.2, blue: 0.3))
                 
-                Text("Experience the best features with our premium subscription")
-                    .font(.title3)
+                Text("Answer one thoughtful question each day for 30 days, then see how you've grown")
+                    .font(.custom("Noteworthy-Light", size: 18))
                     .multilineTextAlignment(.center)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color(red: 0.2, green: 0.2, blue: 0.3).opacity(0.8))
                     .padding(.horizontal, 40)
             }
             

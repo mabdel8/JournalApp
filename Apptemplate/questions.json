@@ -1,0 +1,154 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "text": "What made you smile today?",
+      "category": "gratitude"
+    },
+    {
+      "id": 2,
+      "text": "What challenge did you overcome recently?",
+      "category": "growth"
+    },
+    {
+      "id": 3,
+      "text": "What are you most grateful for right now?",
+      "category": "gratitude"
+    },
+    {
+      "id": 4,
+      "text": "How have you grown since last month?",
+      "category": "growth"
+    },
+    {
+      "id": 5,
+      "text": "What would you tell your younger self?",
+      "category": "reflection"
+    },
+    {
+      "id": 6,
+      "text": "What's one thing you're proud of accomplishing?",
+      "category": "achievement"
+    },
+    {
+      "id": 7,
+      "text": "Who has positively influenced your life lately?",
+      "category": "relationships"
+    },
+    {
+      "id": 8,
+      "text": "What fear did you face today?",
+      "category": "courage"
+    },
+    {
+      "id": 9,
+      "text": "What's something new you learned recently?",
+      "category": "learning"
+    },
+    {
+      "id": 10,
+      "text": "How did you show kindness today?",
+      "category": "kindness"
+    },
+    {
+      "id": 11,
+      "text": "What's your biggest dream right now?",
+      "category": "dreams"
+    },
+    {
+      "id": 12,
+      "text": "What habit are you working on?",
+      "category": "habits"
+    },
+    {
+      "id": 13,
+      "text": "What brought you peace today?",
+      "category": "mindfulness"
+    },
+    {
+      "id": 14,
+      "text": "How have your priorities changed?",
+      "category": "reflection"
+    },
+    {
+      "id": 15,
+      "text": "What's one thing you forgive yourself for?",
+      "category": "self-compassion"
+    },
+    {
+      "id": 16,
+      "text": "What memory makes you happiest?",
+      "category": "memories"
+    },
+    {
+      "id": 17,
+      "text": "What are you looking forward to?",
+      "category": "future"
+    },
+    {
+      "id": 18,
+      "text": "How did you step out of your comfort zone?",
+      "category": "courage"
+    },
+    {
+      "id": 19,
+      "text": "What's the best advice you've received?",
+      "category": "wisdom"
+    },
+    {
+      "id": 20,
+      "text": "What makes you feel most alive?",
+      "category": "passion"
+    },
+    {
+      "id": 21,
+      "text": "How have you surprised yourself lately?",
+      "category": "discovery"
+    },
+    {
+      "id": 22,
+      "text": "What relationship needs your attention?",
+      "category": "relationships"
+    },
+    {
+      "id": 23,
+      "text": "What are you ready to let go of?",
+      "category": "release"
+    },
+    {
+      "id": 24,
+      "text": "How do you want to be remembered?",
+      "category": "legacy"
+    },
+    {
+      "id": 25,
+      "text": "What small victory did you have today?",
+      "category": "achievement"
+    },
+    {
+      "id": 26,
+      "text": "What does success mean to you now?",
+      "category": "values"
+    },
+    {
+      "id": 27,
+      "text": "How have you been kind to yourself?",
+      "category": "self-compassion"
+    },
+    {
+      "id": 28,
+      "text": "What truth have you been avoiding?",
+      "category": "honesty"
+    },
+    {
+      "id": 29,
+      "text": "What brings you hope?",
+      "category": "hope"
+    },
+    {
+      "id": 30,
+      "text": "How have you changed in the last 30 days?",
+      "category": "growth"
+    }
+  ]
+}

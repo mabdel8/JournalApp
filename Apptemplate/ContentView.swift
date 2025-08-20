@@ -10,54 +10,37 @@ import SwiftData
 
 struct ContentView: View {
     @EnvironmentObject var storeManager: StoreManager
+    @Environment(\.modelContext) private var modelContext
+    @AppStorage("isPasscodeEnabled") private var isPasscodeEnabled = false
+    @AppStorage("passcode") private var savedPasscode = ""
     @State private var showPaywall = false
+    @State private var isUnlocked = false
+    @State private var showPasscodeScreen = false
     
     var body: some View {
-        VStack(spacing: 40) {
-            Spacer()
-            
-            VStack(spacing: 20) {
-                Image(systemName: storeManager.isSubscribed ? "crown.fill" : "person.circle.fill")
-                    .font(.system(size: 80))
-                    .foregroundStyle(storeManager.isSubscribed ? .yellow : .gray)
-                
-                Text(storeManager.isSubscribed ? "Premium Account" : "Free Account")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                
-                Text(storeManager.isSubscribed ? "Enjoy unlimited access to all features" : "Upgrade to unlock all features")
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
-            }
-            
-            Spacer()
-            
-            if !storeManager.isSubscribed {
-                Button(action: {
-                    showPaywall = true
-                }) {
-                    Text("Upgrade to Premium")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .cornerRadius(12)
-                }
-                .padding(.horizontal, 40)
+        Group {
+            if isPasscodeEnabled && !isUnlocked && !savedPasscode.isEmpty {
+                PasscodeLockView(isUnlocked: $isUnlocked, savedPasscode: savedPasscode)
+            } else {
+                JournalHomeView()
+                    .environmentObject(storeManager)
+                    .modelContainer(for: JournalEntry.self)
             }
         }
-        .sheet(isPresented: $showPaywall) {
-            PaywallView(isPresented: $showPaywall)
-                .environmentObject(storeManager)
+        .onAppear {
+            checkPasscode()
         }
-        .task {
-            await storeManager.updateSubscriptionStatus()
+    }
+    
+    private func checkPasscode() {
+        if isPasscodeEnabled && !savedPasscode.isEmpty {
+            showPasscodeScreen = true
+        } else {
+            isUnlocked = true
         }
     }
 }
+
 
 #Preview {
     ContentView()
