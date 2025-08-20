@@ -120,7 +120,7 @@ class QuestionManager: ObservableObject {
         
         // Always try to fetch previous answers for testing
         // In production, you'd only do this if cycleNumber > 1
-        fetchPreviousAnswer()
+        fetchPreviousAnswer(for: date)
     }
     
     func getDayNumber(for date: Date) -> Int {
@@ -150,14 +150,21 @@ class QuestionManager: ObservableObject {
     }
     
     func fetchPreviousAnswer() {
+        // Use current view date from the app, fallback to today
+        fetchPreviousAnswer(for: Date())
+    }
+    
+    func fetchPreviousAnswer(for date: Date) {
         guard let context = modelContext,
               let questionId = todaysQuestion?.id else { 
             previousAnswer = nil
             return 
         }
         
-        // For testing, let's find any previous answer for this question
-        // In production, this would look for the previous cycle
+        let calendar = Calendar.current
+        let startOfViewDate = calendar.startOfDay(for: date)
+        
+        // Find previous answers for this question before the current view date
         let descriptor = FetchDescriptor<JournalEntry>(
             predicate: #Predicate { entry in
                 entry.questionId == questionId
@@ -167,10 +174,9 @@ class QuestionManager: ObservableObject {
         
         do {
             let entries = try context.fetch(descriptor)
-            // Get the most recent previous answer (not today's)
-            let today = Calendar.current.startOfDay(for: Date())
+            // Get the most recent previous answer before the current view date
             previousAnswer = entries.first { entry in
-                Calendar.current.startOfDay(for: entry.date) < today
+                calendar.startOfDay(for: entry.date) < startOfViewDate
             }
         } catch {
             print("Error fetching previous answer: \(error)")
@@ -416,30 +422,76 @@ class QuestionManager: ObservableObject {
         let calendar = Calendar.current
         let now = Date()
         
-        // Create test entries for multiple questions with different dates to test timeline
-        let testEntries = [
-            // Question 1 entries
-            (questionId: 1, daysAgo: -5, answer: "Today I smiled when I saw my cat playing in the sunlight. There's something so peaceful about watching animals just being themselves. It reminded me to find joy in simple moments and appreciate the beauty in everyday life."),
-            (questionId: 1, daysAgo: -35, answer: "I smiled today when my friend sent me a funny meme that perfectly captured how I was feeling about Monday morning. It's amazing how shared humor can make you feel connected even when you're apart."),
-            (questionId: 1, daysAgo: -65, answer: "A child's laughter at the park made me smile today. Pure joy is so contagious."),
-            
-            // Question 2 entries
-            (questionId: 2, daysAgo: -10, answer: "I'm grateful for my morning coffee ritual. It's a moment of peace before the day begins, and the warmth of the cup in my hands grounds me."),
-            (questionId: 2, daysAgo: -40, answer: "Grateful for technology today - being able to video chat with family across the country makes distance feel smaller."),
-            
-            // Question 3 entries
-            (questionId: 3, daysAgo: -15, answer: "Today I learned that I have more patience than I thought. When everything went wrong at work, I found myself staying calm and problem-solving instead of panicking."),
-            (questionId: 3, daysAgo: -45, answer: "I discovered I actually enjoy cooking when I'm not rushing. Taking time to prepare a meal mindfully was surprisingly meditative."),
-            
-            // Question 4 entries
-            (questionId: 4, daysAgo: -20, answer: "I faced my fear of public speaking by volunteering to present at the team meeting. My hands were shaking, but I did it anyway."),
-            (questionId: 4, daysAgo: -50, answer: "Challenged myself to have that difficult conversation I'd been avoiding. It went better than expected."),
+        // CRITICAL FIX: Set journal start date to 75 days ago so all test dates fall AFTER start date
+        // This ensures proper question ID calculation instead of all entries defaulting to question 1
+        let journalStartDate = calendar.date(byAdding: .day, value: -75, to: now)!
+        userDefaults.set(journalStartDate, forKey: startDateKey)
+        
+        // Pool of varied, realistic answers for different question types
+        let answerPool = [
+            "I felt most grateful for my morning coffee ritual. That quiet moment before the world wakes up centers me completely.",
+            "The biggest challenge I overcame was speaking up in a difficult conversation. I'm proud I found my voice.",
+            "I smiled when I saw a stranger help an elderly person with groceries. Kindness is everywhere if we look.",
+            "Today I learned that taking breaks actually makes me more productive. Rest isn't laziness, it's necessary.",
+            "I'm grateful for rainy days like today. They force me to slow down and appreciate being cozy indoors.",
+            "The most meaningful conversation was with my neighbor about their garden. Simple connections matter most.",
+            "I felt proudest when I completed my first 5K run. Three months ago, I couldn't run around the block.",
+            "Today taught me that patience really is a virtue. Traffic can't control my inner peace anymore.",
+            "I discovered a hidden coffee shop that feels like a secret haven. The best places are often right under our noses.",
+            "The kindness I showed myself was forgiving my mistakes. Self-compassion is harder than it sounds.",
+            "I felt most connected during dinner with family. No phones, just real conversation and laughter.",
+            "Today I smiled realizing how much I've grown since last year. Progress isn't always obvious day by day.",
+            "The challenge I overcame was admitting I was wrong and apologizing sincerely. Pride is hard to swallow.",
+            "I learned that saying no to some things means saying yes to what really matters to me.",
+            "I'm grateful for unexpected phone calls from old friends. Some bonds never fade, no matter the distance.",
+            "Today I felt proud helping a coworker solve a problem they'd been struggling with for weeks.",
+            "The most meaningful moment was watching the sunset and realizing how rarely I stop to notice beauty around me.",
+            "I discovered I actually enjoy cooking when I'm not rushing. Mindful preparation becomes meditation.",
+            "The kindness I received from a complete stranger at the store restored my faith in human goodness.",
+            "Today I felt most connected sitting in comfortable silence with my pet. Sometimes presence is enough.",
+            "I smiled remembering how different my answer to this question was in previous cycles. Growth is real.",
+            "The challenge I overcame was my perfectionism. Done is so much better than perfect and never finished.",
+            "Today I learned that vulnerability is actually a superpower, not a weakness like I always thought.",
+            "I'm grateful for second chances and the opportunity to do better than I did yesterday.",
+            "The proudest moment was standing up for someone who couldn't advocate for themselves. Courage matters.",
+            "I felt grateful for my health today after hearing about a friend's diagnosis. We take so much for granted.",
+            "The biggest learning was that listening is more powerful than having the right answer all the time.",
+            "I smiled when I caught myself humming while doing mundane chores. Joy can be found anywhere.",
+            "Today's challenge was letting go of control and trusting the process. Some things work out on their own.",
+            "I discovered that my dog is an excellent judge of character. Animals know things we miss.",
+            "The meaningful connection happened with a cashier who remembered my usual order. Small gestures matter.",
+            "I felt proud of choosing to rest instead of pushing through exhaustion. Self-care isn't selfish.",
+            "Today I learned that asking for help is a sign of wisdom, not weakness or failure.",
+            "I'm grateful for books that transport me to different worlds when reality feels too heavy.",
+            "The kindness I showed was buying coffee for the person behind me. Spreading joy is contagious.",
+            "Today I felt connected to my younger self while looking through old photos. That dreamer is still here.",
+            "I smiled when I realized my plants are thriving because I finally learned their individual needs.",
+            "The challenge was setting boundaries without feeling guilty. Protecting my energy helps everyone.",
+            "I discovered that slow mornings are worth waking up earlier for. Rushing sets a frantic tone.",
+            "Today's meaningful moment was my grandmother sharing stories about her youth. History lives in our elders."
         ]
         
-        for (questionId, daysAgo, answer) in testEntries {
-            if let question = orderedQuestions.first(where: { $0.id == questionId }),
-               let testDate = calendar.date(byAdding: .day, value: daysAgo, to: now) {
+        var testEntries: [(questionId: Int, date: Date, answer: String)] = []
+        
+        // Generate realistic test data over past 70 days with proper question distribution
+        for daysAgo in 1...70 {
+            // Skip some days randomly (30% chance to skip) to create realistic gaps
+            if Int.random(in: 1...10) <= 3 { continue }
+            
+            if let testDate = calendar.date(byAdding: .day, value: -daysAgo, to: now) {
+                // Calculate correct question ID based on days since journal start
+                let daysSinceStart = calendar.dateComponents([.day], from: journalStartDate, to: testDate).day ?? 0
+                let questionId = (daysSinceStart % 30) + 1
                 
+                // Select random answer from pool
+                let randomAnswer = answerPool.randomElement()!
+                
+                testEntries.append((questionId: questionId, date: testDate, answer: randomAnswer))
+            }
+        }
+        
+        for (questionId, testDate, answer) in testEntries {
+            if let question = orderedQuestions.first(where: { $0.id == questionId }) {
                 let dayNumber = getDayNumber(for: testDate)
                 let cycleNumber = getCycleNumber(for: testDate)
                 

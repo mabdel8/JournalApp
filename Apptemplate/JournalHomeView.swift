@@ -104,8 +104,8 @@ struct JournalHomeView: View {
                         Menu {
                             Button("Create Test Data") {
                                 questionManager.createTestDataForPreviousAnswers()
-                                // Force refresh to show the previous answer
-                                questionManager.fetchPreviousAnswer()
+                                // Force refresh to show the previous answer for current view date
+                                questionManager.fetchPreviousAnswer(for: currentViewDate)
                             }
                             Button("Clear Test Data") {
                                 questionManager.clearTestData()
@@ -250,8 +250,8 @@ struct JournalHomeView: View {
     
     private func questionOnLines(question: Question) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            // "Today's Reflection" label - 8pt above first line position
-            Text("Today's Reflection")
+            // Dynamic reflection label based on current view date
+            Text(isViewingToday ? "Today's Reflection" : "Reflection")
                 .font(.custom("Noteworthy-Light", size: 22))
                 .foregroundColor(accentColor)
                 .padding(.leading, 10)
@@ -360,7 +360,7 @@ struct JournalHomeView: View {
             // TextEditor with proper mathematical positioning and fixed placeholder
             ZStack(alignment: .topLeading) {
                 // Background placeholder that doesn't block touches
-                if answer.isEmpty && !questionManager.hasJournaledToday() {
+                if answer.isEmpty && isViewingToday {
                     VStack {
                         HStack {
                             Text("Your thoughts today...")
@@ -458,8 +458,10 @@ struct JournalHomeView: View {
         // Update question manager for the current date
         questionManager.updateQuestionForDate(currentViewDate)
         
-        // Load entry for the current date
-        loadEntryForDate(currentViewDate)
+        // Use DispatchQueue to ensure the question manager state updates before loading entry
+        DispatchQueue.main.async {
+            self.loadEntryForDate(self.currentViewDate)
+        }
     }
     
     private func loadEntryForDate(_ date: Date) {
