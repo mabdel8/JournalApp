@@ -29,47 +29,44 @@ struct JournalHomeView: View {
                 paperColor
                     .ignoresSafeArea()
                 
-                // Subtle lines like notebook paper
-                GeometryReader { geometry in
-                    Path { path in
-                        let lineSpacing: CGFloat = 30
-                        var currentY: CGFloat = 100
-                        
-                        while currentY < geometry.size.height {
-                            path.move(to: CGPoint(x: 20, y: currentY))
-                            path.addLine(to: CGPoint(x: geometry.size.width - 20, y: currentY))
-                            currentY += lineSpacing
-                        }
-                    }
-                    .stroke(Color.gray.opacity(0.2), lineWidth: 0.5)
-                }
-                
                 ScrollView {
-                    VStack(spacing: 30) {
-                        // Header with date and day counter
-                        headerView
+                    ZStack(alignment: .topLeading) {
+                        // Notebook lines that scroll with content
+                        notebookLinesView
                         
-                        // Question card
-                        if let question = questionManager.todaysQuestion {
-                            questionCard(question: question)
+                        // Content positioned mathematically above the lines
+                        VStack(spacing: 0) {
+                            // Header with date and day counter
+                            headerView
+                                .padding(.top, 20) // Reduced to help align first text with first line
+                                .padding(.bottom, 10)
+                            
+                            // Question text positioned on lines
+                            if let question = questionManager.todaysQuestion {
+                                questionOnLines(question: question)
+                            }
+                            
+                            // Previous answer (if in cycle 2+)
+                            if let previousEntry = questionManager.previousAnswer {
+                                previousAnswerOnLines(entry: previousEntry)
+                            }
+                            
+                            // Answer input area on lines
+                            answerOnLines
+                            
+                            // Save button
+                            if !questionManager.hasJournaledToday() {
+                                saveButton
+                                    .padding(.top, 30)
+                            } else {
+                                completedTodayView
+                                    .padding(.top, 30)
+                            }
+                            
+                            Spacer(minLength: 200) // Extra space for writing
                         }
-                        
-                        // Previous answer (if in cycle 2+)
-                        if let previousEntry = questionManager.previousAnswer {
-                            previousAnswerCard(entry: previousEntry)
-                        }
-                        
-                        // Answer input area
-                        answerInputArea
-                        
-                        // Save button
-                        if !questionManager.hasJournaledToday() {
-                            saveButton
-                        } else {
-                            completedTodayView
-                        }
+                        .padding(.horizontal, 30)
                     }
-                    .padding()
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -110,6 +107,24 @@ struct JournalHomeView: View {
         }
     }
     
+    private var notebookLinesView: some View {
+        GeometryReader { geometry in
+            Path { path in
+                let lineSpacing: CGFloat = 41
+                let totalHeight: CGFloat = max(geometry.size.height, 1200) // Ensure enough lines
+                var currentY: CGFloat = 120 // Start after header space
+                
+                while currentY < totalHeight {
+                    path.move(to: CGPoint(x: 30, y: currentY))
+                    path.addLine(to: CGPoint(x: geometry.size.width - 30, y: currentY))
+                    currentY += lineSpacing
+                }
+            }
+            .stroke(Color.gray.opacity(0.3), lineWidth: 0.5)
+        }
+        .frame(minHeight: 1200) // Ensure scrollable content
+    }
+    
     private var headerView: some View {
         VStack(spacing: 8) {
             Text(Date(), format: .dateTime.weekday(.wide).month(.wide).day())
@@ -135,33 +150,31 @@ struct JournalHomeView: View {
         .padding(.top, 20)
     }
     
-    private func questionCard(question: Question) -> some View {
-        VStack(alignment: .leading, spacing: 15) {
+    private func questionOnLines(question: Question) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // "Today's Reflection" label - 8pt above first line position
             Text("Today's Reflection")
-                .font(.custom("Noteworthy-Light", size: 14))
+                .font(.custom("Noteworthy-Light", size: 22))
                 .foregroundColor(accentColor)
+                .padding(.leading, 10)
+                .padding(.top, 14) // Mathematical positioning: gets us to Y≈98
+                .padding(.bottom, 8)
             
+            // Question text - positioned to sit above lines mathematically
             Text(question.text)
-                .font(.custom("Noteworthy-Bold", size: 22))
+                .font(.custom("Noteworthy-Bold", size: 18))
                 .foregroundColor(inkColor)
+                .lineSpacing(12) // 30pt line spacing - 18pt font = 12pt line spacing
                 .multilineTextAlignment(.leading)
+                .padding(.leading, 10)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(20)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(paperColor)
-                .shadow(color: inkColor.opacity(0.1), radius: 5, x: 2, y: 2)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(accentColor.opacity(0.2), lineWidth: 1)
-        )
+        .padding(.bottom, 30) // Consistent spacing to next section
     }
     
-    private func previousAnswerCard(entry: JournalEntry) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+    private func previousAnswerOnLines(entry: JournalEntry) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Image(systemName: "clock.arrow.circlepath")
                     .foregroundColor(accentColor)
@@ -177,39 +190,57 @@ struct JournalHomeView: View {
                     .font(.custom("Noteworthy-Light", size: 12))
                     .foregroundColor(inkColor.opacity(0.6))
             }
+            .padding(.leading, 10)
+            .padding(.bottom, 8)
             
+            // Previous answer text aligned above lines
             Text(entry.answer)
-                .font(.custom("Noteworthy-Light", size: 16))
-                .foregroundColor(inkColor.opacity(0.8))
+                .font(.custom("Noteworthy-Light", size: 18))
+                .foregroundColor(inkColor.opacity(0.6))
+                .lineSpacing(12) // 30pt line spacing - 18pt font = 12pt line spacing
                 .multilineTextAlignment(.leading)
+                .padding(.leading, 10)
+                .italic()
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(15)
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(accentColor.opacity(0.05))
-        )
+        .padding(.bottom, 30)
     }
     
-    private var answerInputArea: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Your thoughts today...")
-                .font(.custom("Noteworthy-Light", size: 14))
-                .foregroundColor(inkColor.opacity(0.6))
-            
-            TextEditor(text: $answer)
-                .font(.custom("Noteworthy-Light", size: 18))
-                .foregroundColor(inkColor)
-                .scrollContentBackground(.hidden)
-                .background(Color.clear)
-                .frame(minHeight: 150)
-                .padding(10)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(accentColor.opacity(0.3), lineWidth: 1)
-                )
-                .disabled(questionManager.hasJournaledToday())
+    private var answerOnLines: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // TextEditor with proper mathematical positioning and fixed placeholder
+            ZStack(alignment: .topLeading) {
+                // Background placeholder that doesn't block touches
+                if answer.isEmpty && !questionManager.hasJournaledToday() {
+                    VStack {
+                        HStack {
+                            Text("Your thoughts today...")
+                                .font(.custom("Noteworthy-Light", size: 18))
+                                .foregroundColor(inkColor.opacity(0.3))
+                                .padding(.leading, 15)
+                                .padding(.top, 8)
+                            Spacer()
+                        }
+                        Spacer()
+                    }
+                    .allowsHitTesting(false) // Allows clicks to pass through to TextEditor
+                }
+                
+                // TextEditor positioned above lines mathematically
+                TextEditor(text: $answer)
+                    .font(.custom("Noteworthy-Light", size: 18))
+                    .foregroundColor(inkColor)
+                    .lineSpacing(12) // 30pt line spacing - 18pt font = 12pt line spacing
+                    .scrollContentBackground(.hidden)
+                    .background(Color.clear)
+                    .frame(minHeight: 210) // 7 lines × 30pt = 210pt
+                    .padding(.leading, 10)
+                    .padding(.trailing, 10)
+                    .disabled(questionManager.hasJournaledToday())
+            }
         }
+        .padding(.top, 16)
+        .padding(.bottom, 30)
     }
     
     private var saveButton: some View {
