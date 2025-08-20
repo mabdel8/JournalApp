@@ -17,6 +17,7 @@ struct JournalHomeView: View {
     @State private var navigateToCalendar = false
     @State private var navigateToSettings = false
     @State private var navigateToHistory = false
+    @State private var navigateToTimeline = false
     @State private var autoSaveTimer: Timer?
     @State private var hasUnsavedChanges = false
     @State private var currentViewDate = Date() // Track which day we're viewing
@@ -115,6 +116,11 @@ struct JournalHomeView: View {
                                 .foregroundColor(accentColor.opacity(0.7))
                         }
                         
+                        Button(action: { navigateToTimeline = true }) {
+                            Image(systemName: "clock.arrow.circlepath")
+                                .foregroundColor(accentColor)
+                        }
+                        
                         Button(action: { navigateToHistory = true }) {
                             Image(systemName: "book.pages")
                                 .foregroundColor(accentColor)
@@ -152,6 +158,10 @@ struct JournalHomeView: View {
             }
             .navigationDestination(isPresented: $navigateToHistory) {
                 JournalHistoryView()
+                    .environmentObject(storeManager)
+            }
+            .navigationDestination(isPresented: $navigateToTimeline) {
+                QuestionTimelineView()
                     .environmentObject(storeManager)
             }
         }

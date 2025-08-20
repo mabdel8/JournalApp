@@ -411,41 +411,53 @@ class QuestionManager: ObservableObject {
     // MARK: - Test Data (Remove this in production)
     
     func createTestDataForPreviousAnswers() {
-        guard let context = modelContext,
-              let firstQuestion = orderedQuestions.first else { return }
+        guard let context = modelContext else { return }
         
         let calendar = Calendar.current
         let now = Date()
         
-        // Create test entry from 30 days ago (cycle 1)
-        if let thirtyDaysAgo = calendar.date(byAdding: .day, value: -30, to: now) {
-            let testEntry1 = JournalEntry(
-                questionId: firstQuestion.id,
-                question: firstQuestion.text,
-                answer: "Today I smiled when I saw my cat playing in the sunlight. There's something so peaceful about watching animals just being themselves. It reminded me to find joy in simple moments.",
-                date: thirtyDaysAgo,
-                dayNumber: 1,
-                cycleNumber: 1
-            )
-            context.insert(testEntry1)
-        }
+        // Create test entries for multiple questions with different dates to test timeline
+        let testEntries = [
+            // Question 1 entries
+            (questionId: 1, daysAgo: -5, answer: "Today I smiled when I saw my cat playing in the sunlight. There's something so peaceful about watching animals just being themselves. It reminded me to find joy in simple moments and appreciate the beauty in everyday life."),
+            (questionId: 1, daysAgo: -35, answer: "I smiled today when my friend sent me a funny meme that perfectly captured how I was feeling about Monday morning. It's amazing how shared humor can make you feel connected even when you're apart."),
+            (questionId: 1, daysAgo: -65, answer: "A child's laughter at the park made me smile today. Pure joy is so contagious."),
+            
+            // Question 2 entries
+            (questionId: 2, daysAgo: -10, answer: "I'm grateful for my morning coffee ritual. It's a moment of peace before the day begins, and the warmth of the cup in my hands grounds me."),
+            (questionId: 2, daysAgo: -40, answer: "Grateful for technology today - being able to video chat with family across the country makes distance feel smaller."),
+            
+            // Question 3 entries
+            (questionId: 3, daysAgo: -15, answer: "Today I learned that I have more patience than I thought. When everything went wrong at work, I found myself staying calm and problem-solving instead of panicking."),
+            (questionId: 3, daysAgo: -45, answer: "I discovered I actually enjoy cooking when I'm not rushing. Taking time to prepare a meal mindfully was surprisingly meditative."),
+            
+            // Question 4 entries
+            (questionId: 4, daysAgo: -20, answer: "I faced my fear of public speaking by volunteering to present at the team meeting. My hands were shaking, but I did it anyway."),
+            (questionId: 4, daysAgo: -50, answer: "Challenged myself to have that difficult conversation I'd been avoiding. It went better than expected."),
+        ]
         
-        // Create test entry from 60 days ago (cycle 2, if we pretend we're in cycle 3)
-        if let sixtyDaysAgo = calendar.date(byAdding: .day, value: -60, to: now) {
-            let testEntry2 = JournalEntry(
-                questionId: firstQuestion.id,
-                question: firstQuestion.text,
-                answer: "I smiled today when my friend sent me a funny meme that perfectly captured how I was feeling about Monday morning. It's amazing how shared humor can make you feel connected even when you're apart.",
-                date: sixtyDaysAgo,
-                dayNumber: 1,
-                cycleNumber: 1 // This should be cycle 2 in real usage
-            )
-            context.insert(testEntry2)
+        for (questionId, daysAgo, answer) in testEntries {
+            if let question = orderedQuestions.first(where: { $0.id == questionId }),
+               let testDate = calendar.date(byAdding: .day, value: daysAgo, to: now) {
+                
+                let dayNumber = getDayNumber(for: testDate)
+                let cycleNumber = getCycleNumber(for: testDate)
+                
+                let testEntry = JournalEntry(
+                    questionId: questionId,
+                    question: question.text,
+                    answer: answer,
+                    date: testDate,
+                    dayNumber: dayNumber,
+                    cycleNumber: cycleNumber
+                )
+                context.insert(testEntry)
+            }
         }
         
         do {
             try context.save()
-            print("Test data created for previous answers feature")
+            print("Test data created for timeline feature")
         } catch {
             print("Error creating test data: \(error)")
         }
