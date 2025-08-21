@@ -94,22 +94,6 @@ struct JournalHomeView: View {
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack(spacing: 15) {
-                        // Test button (remove in production)
-                        Menu {
-                            Button("Create Test Data") {
-                                questionManager.createTestDataForPreviousAnswers()
-                                // Force refresh to show the previous answer for current view date
-                                questionManager.fetchPreviousAnswer(for: currentViewDate)
-                            }
-                            Button("Clear Test Data") {
-                                questionManager.clearTestData()
-                                questionManager.previousAnswer = nil
-                            }
-                        } label: {
-                            Image(systemName: "flask")
-                                .foregroundColor(accentColor.opacity(0.7))
-                        }
-                        
                         Button(action: { navigateToTimeline = true }) {
                             Image(systemName: "clock.arrow.circlepath")
                                 .foregroundColor(accentColor)
@@ -445,24 +429,32 @@ struct JournalHomeView: View {
             return 
         }
         
-        let context = modelContext
-        let calendar = Calendar.current
-        let startOfDay = calendar.startOfDay(for: date)
-        let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
-        
-        let descriptor = FetchDescriptor<JournalEntry>(
-            predicate: #Predicate { entry in
-                entry.questionId == questionId &&
-                entry.date >= startOfDay &&
-                entry.date < endOfDay
+        // Only load existing entries into the text field if we're viewing today
+        // For past/future dates or when we should create new entries, start with empty text
+        if isViewingToday {
+            let context = modelContext
+            let calendar = Calendar.current
+            let startOfDay = calendar.startOfDay(for: date)
+            let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
+            
+            let descriptor = FetchDescriptor<JournalEntry>(
+                predicate: #Predicate { entry in
+                    entry.questionId == questionId &&
+                    entry.date >= startOfDay &&
+                    entry.date < endOfDay
+                }
+            )
+            
+            do {
+                let entries = try context.fetch(descriptor)
+                answer = entries.first?.answer ?? ""
+            } catch {
+                print("Error loading entry for date: \(error)")
+                answer = ""
             }
-        )
-        
-        do {
-            let entries = try context.fetch(descriptor)
-            answer = entries.first?.answer ?? ""
-        } catch {
-            print("Error loading entry for date: \(error)")
+        } else {
+            // For past dates or when not viewing today, start with empty text
+            // The previous answer will be shown separately as read-only
             answer = ""
         }
     }

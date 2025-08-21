@@ -8,17 +8,67 @@
 
 /* Begin PBXBuildFile section */
 		2F191F5D2E5445E500D1FC57 /* apptemplatestorekit.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 2F191F5C2E5445E500D1FC57 /* apptemplatestorekit.storekit */; };
+		2F1920712E56954F00D1FC57 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F1920702E56954F00D1FC57 /* StoreKit.framework */; };
+		2F1920782E56979E00D1FC57 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F1920772E56979E00D1FC57 /* WidgetKit.framework */; };
+		2F19207A2E56979E00D1FC57 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F1920792E56979E00D1FC57 /* SwiftUI.framework */; };
+		2F1920892E56979F00D1FC57 /* calendarwidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2F1920762E56979E00D1FC57 /* calendarwidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		2F1920872E56979F00D1FC57 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2F191F432E54454F00D1FC57 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2F1920752E56979E00D1FC57;
+			remoteInfo = calendarwidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		2F19208E2E56979F00D1FC57 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				2F1920892E56979F00D1FC57 /* calendarwidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		2F191F4B2E54454F00D1FC57 /* Apptemplate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Apptemplate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2F191F5C2E5445E500D1FC57 /* apptemplatestorekit.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = apptemplatestorekit.storekit; sourceTree = "<group>"; };
+		2F1920702E56954F00D1FC57 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		2F1920762E56979E00D1FC57 /* calendarwidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = calendarwidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		2F1920772E56979E00D1FC57 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		2F1920792E56979E00D1FC57 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		2F19208A2E56979F00D1FC57 /* Exceptions for "calendarwidget" folder in "calendarwidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 2F1920752E56979E00D1FC57 /* calendarwidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		2F191F4D2E54454F00D1FC57 /* Apptemplate */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Apptemplate;
+			sourceTree = "<group>";
+		};
+		2F19207B2E56979E00D1FC57 /* calendarwidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				2F19208A2E56979F00D1FC57 /* Exceptions for "calendarwidget" folder in "calendarwidgetExtension" target */,
+			);
+			path = calendarwidget;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -28,6 +78,16 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2F1920712E56954F00D1FC57 /* StoreKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2F1920732E56979E00D1FC57 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2F19207A2E56979E00D1FC57 /* SwiftUI.framework in Frameworks */,
+				2F1920782E56979E00D1FC57 /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -39,6 +99,8 @@
 			children = (
 				2F191F5C2E5445E500D1FC57 /* apptemplatestorekit.storekit */,
 				2F191F4D2E54454F00D1FC57 /* Apptemplate */,
+				2F19207B2E56979E00D1FC57 /* calendarwidget */,
+				2F19206F2E56954F00D1FC57 /* Frameworks */,
 				2F191F4C2E54454F00D1FC57 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -47,8 +109,19 @@
 			isa = PBXGroup;
 			children = (
 				2F191F4B2E54454F00D1FC57 /* Apptemplate.app */,
+				2F1920762E56979E00D1FC57 /* calendarwidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		2F19206F2E56954F00D1FC57 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2F1920702E56954F00D1FC57 /* StoreKit.framework */,
+				2F1920772E56979E00D1FC57 /* WidgetKit.framework */,
+				2F1920792E56979E00D1FC57 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -61,10 +134,12 @@
 				2F191F472E54454F00D1FC57 /* Sources */,
 				2F191F482E54454F00D1FC57 /* Frameworks */,
 				2F191F492E54454F00D1FC57 /* Resources */,
+				2F19208E2E56979F00D1FC57 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				2F1920882E56979F00D1FC57 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				2F191F4D2E54454F00D1FC57 /* Apptemplate */,
@@ -75,6 +150,28 @@
 			productName = Apptemplate;
 			productReference = 2F191F4B2E54454F00D1FC57 /* Apptemplate.app */;
 			productType = "com.apple.product-type.application";
+		};
+		2F1920752E56979E00D1FC57 /* calendarwidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2F19208B2E56979F00D1FC57 /* Build configuration list for PBXNativeTarget "calendarwidgetExtension" */;
+			buildPhases = (
+				2F1920722E56979E00D1FC57 /* Sources */,
+				2F1920732E56979E00D1FC57 /* Frameworks */,
+				2F1920742E56979E00D1FC57 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				2F19207B2E56979E00D1FC57 /* calendarwidget */,
+			);
+			name = calendarwidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = calendarwidgetExtension;
+			productReference = 2F1920762E56979E00D1FC57 /* calendarwidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -87,6 +184,9 @@
 				LastUpgradeCheck = 1640;
 				TargetAttributes = {
 					2F191F4A2E54454F00D1FC57 = {
+						CreatedOnToolsVersion = 16.4;
+					};
+					2F1920752E56979E00D1FC57 = {
 						CreatedOnToolsVersion = 16.4;
 					};
 				};
@@ -106,6 +206,7 @@
 			projectRoot = "";
 			targets = (
 				2F191F4A2E54454F00D1FC57 /* Apptemplate */,
+				2F1920752E56979E00D1FC57 /* calendarwidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -119,6 +220,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		2F1920742E56979E00D1FC57 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -129,7 +237,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		2F1920722E56979E00D1FC57 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		2F1920882E56979F00D1FC57 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2F1920752E56979E00D1FC57 /* calendarwidgetExtension */;
+			targetProxy = 2F1920872E56979F00D1FC57 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		2F191F572E54455100D1FC57 /* Debug */ = {
@@ -260,6 +383,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Journal App";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Requires face id to unlock journal";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -269,8 +393,10 @@
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
@@ -299,6 +425,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Journal App";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Requires face id to unlock journal";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -308,8 +435,10 @@
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
@@ -323,6 +452,65 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				XROS_DEPLOYMENT_TARGET = 2.5;
+			};
+			name = Release;
+		};
+		2F19208C2E56979F00D1FC57 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3K6UAJ55JH;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = calendarwidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = calendarwidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mohamedabdelmagid.JournalApp.calendarwidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		2F19208D2E56979F00D1FC57 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3K6UAJ55JH;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = calendarwidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = calendarwidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mohamedabdelmagid.JournalApp.calendarwidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -343,6 +531,15 @@
 			buildConfigurations = (
 				2F191F5A2E54455100D1FC57 /* Debug */,
 				2F191F5B2E54455100D1FC57 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2F19208B2E56979F00D1FC57 /* Build configuration list for PBXNativeTarget "calendarwidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2F19208C2E56979F00D1FC57 /* Debug */,
+				2F19208D2E56979F00D1FC57 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
