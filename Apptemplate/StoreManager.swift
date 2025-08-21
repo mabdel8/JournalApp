@@ -35,8 +35,8 @@ final class StoreManager: ObservableObject {
     }
     
     private let productIds = [
-        "template_weekly",
-        "template_lifetime"
+        "ja_weekly199",
+        "ja_lifetime"
     ]
     
     init() {
@@ -94,7 +94,7 @@ final class StoreManager: ObservableObject {
         for await result in Transaction.currentEntitlements {
             switch result {
             case .verified(let transaction):
-                if transaction.productID == "template_weekly" || transaction.productID == "template_lifetime" {
+                if transaction.productID == "ja_weekly199" || transaction.productID == "ja_lifetime" {
                     hasActiveSubscription = true
                     break
                 }

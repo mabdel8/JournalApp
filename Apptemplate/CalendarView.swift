@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import StoreKit
 
 struct CalendarView: View {
     @Environment(\.modelContext) private var modelContext
@@ -55,6 +56,7 @@ struct CalendarView: View {
         .onAppear {
             questionManager.modelContext = modelContext
             loadEntriesForMonth()
+            checkFirstCalendarVisit()
         }
         .onChange(of: selectedMonth) { _, _ in
             loadEntriesForMonth()
@@ -372,6 +374,37 @@ struct CalendarView: View {
         }
         
         return maxStreak
+    }
+    
+    // MARK: - Rating Request
+    
+    private func checkFirstCalendarVisit() {
+        let hasVisitedCalendarKey = "hasVisitedCalendar"
+        let hasRequestedRatingKey = "hasRequestedRating"
+        
+        // Check if this is the first time visiting calendar and we haven't requested rating yet
+        let hasVisitedCalendar = UserDefaults.standard.bool(forKey: hasVisitedCalendarKey)
+        let hasRequestedRating = UserDefaults.standard.bool(forKey: hasRequestedRatingKey)
+        
+        if !hasVisitedCalendar && !hasRequestedRating {
+            // Mark that user has visited calendar
+            UserDefaults.standard.set(true, forKey: hasVisitedCalendarKey)
+            
+            // Request rating immediately when entering calendar for first time
+            requestAppRating()
+        }
+    }
+    
+    private func requestAppRating() {
+        let hasRequestedRatingKey = "hasRequestedRating"
+        
+        // Mark that we've requested rating so we don't show it again
+        UserDefaults.standard.set(true, forKey: hasRequestedRatingKey)
+        
+        // Request rating using StoreKit
+        if let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+            SKStoreReviewController.requestReview(in: scene)
+        }
     }
 }
 

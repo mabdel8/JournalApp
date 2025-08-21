@@ -12,7 +12,7 @@
   "identifier" : "129CF644",
   "nonRenewingSubscriptions" : [
     {
-      "displayPrice" : "19.99",
+      "displayPrice" : "14.99",
       "familyShareable" : false,
       "internalID" : "385D81F1",
       "localizations" : [
@@ -23,7 +23,7 @@
         }
       ],
       "productID" : "template_lifetime",
-      "referenceName" : "Lifetime Plan",
+      "referenceName" : "ja_lifetime",
       "type" : "NonRenewingSubscription"
     }
   ],
@@ -32,6 +32,8 @@
   ],
   "settings" : {
     "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
     "_storeKitErrors" : [
       {
         "current" : null,
@@ -95,7 +97,7 @@
           "codeOffers" : [
 
           ],
-          "displayPrice" : "3.99",
+          "displayPrice" : "1.99",
           "familyShareable" : false,
           "groupNumber" : 1,
           "internalID" : "057EC4B9",
@@ -111,7 +113,7 @@
               "locale" : "en_US"
             }
           ],
-          "productID" : "template_weekly",
+          "productID" : "ja_weekly199",
           "recurringSubscriptionPeriod" : "P1W",
           "referenceName" : "Weekly Plan",
           "subscriptionGroupID" : "134A01EA",

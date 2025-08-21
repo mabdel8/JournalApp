@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2F191F4A2E54454F00D1FC57"
-               BuildableName = "Apptemplate.app"
-               BlueprintName = "Apptemplate"
-               ReferencedContainer = "container:Apptemplate.xcodeproj">
+               BuildableName = "JournalApp.app"
+               BlueprintName = "JournalApp"
+               ReferencedContainer = "container:JournalApp.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -45,14 +45,11 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2F191F4A2E54454F00D1FC57"
-            BuildableName = "Apptemplate.app"
-            BlueprintName = "Apptemplate"
-            ReferencedContainer = "container:Apptemplate.xcodeproj">
+            BuildableName = "JournalApp.app"
+            BlueprintName = "JournalApp"
+            ReferencedContainer = "container:JournalApp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <StoreKitConfigurationFileReference
-         identifier = "../../apptemplatestorekit.storekit">
-      </StoreKitConfigurationFileReference>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -65,9 +62,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2F191F4A2E54454F00D1FC57"
-            BuildableName = "Apptemplate.app"
-            BlueprintName = "Apptemplate"
-            ReferencedContainer = "container:Apptemplate.xcodeproj">
+            BuildableName = "JournalApp.app"
+            BlueprintName = "JournalApp"
+            ReferencedContainer = "container:JournalApp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

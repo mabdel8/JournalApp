@@ -13,7 +13,7 @@ class SharedDataManager {
     static let shared = SharedDataManager()
     
     // App Group identifier - this needs to be configured in both app and widget targets
-    private let appGroupIdentifier = "group.com.yourcompany.journalapp"
+    private let appGroupIdentifier = "group.com.mohamedabdelmagid.JournalApp"
     
     // UserDefaults keys for shared data
     private struct Keys {

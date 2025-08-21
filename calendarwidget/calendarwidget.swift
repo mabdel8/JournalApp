@@ -80,22 +80,22 @@ struct JournalCalendarProvider: AppIntentTimelineProvider {
     
     private func fetchJournalData() -> (journalDates: Set<Int>, totalEntries: Int, currentStreak: Int) {
         // Try to fetch real journal data from shared app group container
-        if let sharedDefaults = UserDefaults(suiteName: "group.com.yourcompany.journalapp") {
+        if let sharedDefaults = UserDefaults(suiteName: "group.com.mohamedabdelmagid.JournalApp") {
             let journalDates = Set(sharedDefaults.array(forKey: "shared_journal_dates") as? [Int] ?? [])
             let totalEntries = sharedDefaults.integer(forKey: "shared_total_entries")
             let currentStreak = sharedDefaults.integer(forKey: "shared_current_streak")
+            let lastUpdateDate = sharedDefaults.object(forKey: "shared_last_update_date") as? Date
             
-            // If we have real data, use it
-            if totalEntries > 0 {
-                print("✅ Using real journal data: \(journalDates.count) days, \(totalEntries) total entries, \(currentStreak) streak")
+            // If we have a last update date, that means the app has synced data at least once
+            if let lastUpdate = lastUpdateDate {
+                print("✅ Using real journal data: \(journalDates.count) days, \(totalEntries) total entries, \(currentStreak) streak (last update: \(lastUpdate))")
                 return (journalDates, totalEntries, currentStreak)
             }
         }
         
-        // Fallback to sample data for testing/development
-        print("⚠️ No shared journal data found, using sample data")
-        let sampleDates = Set([1, 3, 5, 8, 10, 12, 15, 18, 20, 22, 25, 27])
-        return (journalDates: sampleDates, totalEntries: 12, currentStreak: 5)
+        // Return empty data when no sync has happened yet (new user or app group not configured)
+        print("⚠️ No shared journal data found, showing empty state")
+        return (journalDates: Set<Int>(), totalEntries: 0, currentStreak: 0)
     }
 }
 

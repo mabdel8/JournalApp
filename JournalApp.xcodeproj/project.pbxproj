@@ -39,12 +39,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		2F191F4B2E54454F00D1FC57 /* Apptemplate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Apptemplate.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2F191F4B2E54454F00D1FC57 /* JournalApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JournalApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2F191F5C2E5445E500D1FC57 /* apptemplatestorekit.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = apptemplatestorekit.storekit; sourceTree = "<group>"; };
 		2F1920702E56954F00D1FC57 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		2F1920762E56979E00D1FC57 /* calendarwidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = calendarwidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		2F1920772E56979E00D1FC57 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		2F1920792E56979E00D1FC57 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		2F1920922E56FA4B00D1FC57 /* calendarwidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = calendarwidgetExtension.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -97,6 +98,7 @@
 		2F191F422E54454F00D1FC57 = {
 			isa = PBXGroup;
 			children = (
+				2F1920922E56FA4B00D1FC57 /* calendarwidgetExtension.entitlements */,
 				2F191F5C2E5445E500D1FC57 /* apptemplatestorekit.storekit */,
 				2F191F4D2E54454F00D1FC57 /* Apptemplate */,
 				2F19207B2E56979E00D1FC57 /* calendarwidget */,
@@ -108,7 +110,7 @@
 		2F191F4C2E54454F00D1FC57 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				2F191F4B2E54454F00D1FC57 /* Apptemplate.app */,
+				2F191F4B2E54454F00D1FC57 /* JournalApp.app */,
 				2F1920762E56979E00D1FC57 /* calendarwidgetExtension.appex */,
 			);
 			name = Products;
@@ -127,9 +129,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		2F191F4A2E54454F00D1FC57 /* Apptemplate */ = {
+		2F191F4A2E54454F00D1FC57 /* JournalApp */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 2F191F592E54455100D1FC57 /* Build configuration list for PBXNativeTarget "Apptemplate" */;
+			buildConfigurationList = 2F191F592E54455100D1FC57 /* Build configuration list for PBXNativeTarget "JournalApp" */;
 			buildPhases = (
 				2F191F472E54454F00D1FC57 /* Sources */,
 				2F191F482E54454F00D1FC57 /* Frameworks */,
@@ -144,11 +146,11 @@
 			fileSystemSynchronizedGroups = (
 				2F191F4D2E54454F00D1FC57 /* Apptemplate */,
 			);
-			name = Apptemplate;
+			name = JournalApp;
 			packageProductDependencies = (
 			);
 			productName = Apptemplate;
-			productReference = 2F191F4B2E54454F00D1FC57 /* Apptemplate.app */;
+			productReference = 2F191F4B2E54454F00D1FC57 /* JournalApp.app */;
 			productType = "com.apple.product-type.application";
 		};
 		2F1920752E56979E00D1FC57 /* calendarwidgetExtension */ = {
@@ -191,7 +193,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 2F191F462E54454F00D1FC57 /* Build configuration list for PBXProject "Apptemplate" */;
+			buildConfigurationList = 2F191F462E54454F00D1FC57 /* Build configuration list for PBXProject "JournalApp" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -205,7 +207,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				2F191F4A2E54454F00D1FC57 /* Apptemplate */,
+				2F191F4A2E54454F00D1FC57 /* JournalApp */,
 				2F1920752E56979E00D1FC57 /* calendarwidgetExtension */,
 			);
 		};
@@ -377,6 +379,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Apptemplate/Apptemplate.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 3K6UAJ55JH;
@@ -403,6 +406,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mohamedabdelmagid.JournalApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
@@ -419,6 +423,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Apptemplate/Apptemplate.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 3K6UAJ55JH;
@@ -445,6 +450,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mohamedabdelmagid.JournalApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
@@ -460,6 +466,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = calendarwidgetExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 3K6UAJ55JH;
@@ -476,6 +484,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mohamedabdelmagid.JournalApp.calendarwidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -489,6 +498,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = calendarwidgetExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 3K6UAJ55JH;
@@ -505,6 +516,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mohamedabdelmagid.JournalApp.calendarwidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -517,7 +529,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		2F191F462E54454F00D1FC57 /* Build configuration list for PBXProject "Apptemplate" */ = {
+		2F191F462E54454F00D1FC57 /* Build configuration list for PBXProject "JournalApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2F191F572E54455100D1FC57 /* Debug */,
@@ -526,7 +538,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		2F191F592E54455100D1FC57 /* Build configuration list for PBXNativeTarget "Apptemplate" */ = {
+		2F191F592E54455100D1FC57 /* Build configuration list for PBXNativeTarget "JournalApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2F191F5A2E54455100D1FC57 /* Debug */,

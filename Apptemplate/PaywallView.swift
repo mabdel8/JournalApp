@@ -13,7 +13,7 @@ struct PaywallView: View {
     @EnvironmentObject var storeManager: StoreManager
     @Binding var isPresented: Bool
     @State private var currentTestimonial = 0
-    @State private var selectedPlan: String = "template_weekly"
+    @State private var selectedPlan: String = "ja_weekly199"
     @State private var testimonialTimer: Timer?
     
     // Journal app theme colors
@@ -152,20 +152,20 @@ struct PaywallView: View {
         VStack(spacing: 12) {
             PlanCardView(
                 title: "Lifetime Plan",
-                price: lifetimeProduct?.displayPrice ?? "$19.99",
+                price: lifetimeProduct?.displayPrice ?? "$14.99",
                 originalPrice: "$149",
                 badge: "BEST DEAL",
-                isSelected: selectedPlan == "template_lifetime",
-                onTap: { selectedPlan = "template_lifetime" },
+                isSelected: selectedPlan == "ja_lifetime",
+                onTap: { selectedPlan = "ja_lifetime" },
                 inkColor: inkColor,
                 accentColor: accentColor
             )
             
             PlanCardView(
                 title: "3-Day Trial",
-                subtitle: "then $2.99 per week",
-                isSelected: selectedPlan == "template_weekly",
-                onTap: { selectedPlan = "template_weekly" },
+                subtitle: "then $1.99 per week",
+                isSelected: selectedPlan == "ja_weekly199",
+                onTap: { selectedPlan = "ja_weekly199" },
                 inkColor: inkColor,
                 accentColor: accentColor
             )
@@ -208,31 +208,27 @@ struct PaywallView: View {
             Text("•")
                 .foregroundColor(inkColor.opacity(0.6))
             
-            Button("Terms") {
-                // TODO: Handle terms action
-            }
-            .font(.custom("Noteworthy-Light", size: 14))
-            .foregroundColor(inkColor.opacity(0.6))
+            Link("Terms", destination: URL(string: "https://abdalla2024.github.io/JournalApp/terms.html")!)
+                .font(.custom("Noteworthy-Light", size: 14))
+                .foregroundColor(inkColor.opacity(0.6))
             
             Text("•")
                 .foregroundColor(inkColor.opacity(0.6))
             
-            Button("Privacy") {
-                // TODO: Handle privacy action
-            }
-            .font(.custom("Noteworthy-Light", size: 14))
-            .foregroundColor(inkColor.opacity(0.6))
+            Link("Privacy", destination: URL(string: "https://abdalla2024.github.io/JournalApp/privacy.html")!)
+                .font(.custom("Noteworthy-Light", size: 14))
+                .foregroundColor(inkColor.opacity(0.6))
         }
         .padding(.bottom, 20)
     }
     
     // MARK: - Computed Properties
     private var lifetimeProduct: Product? {
-        storeManager.products.first { $0.id == "template_lifetime" }
+        storeManager.products.first { $0.id == "ja_lifetime" }
     }
     
     private var purchaseButtonText: String {
-        selectedPlan == "template_weekly" ? "Start 3-Day Free Trial" : "Purchase Lifetime"
+        selectedPlan == "ja_weekly199" ? "Start 3-Day Free Trial" : "Purchase Lifetime"
     }
     
     // MARK: - Methods

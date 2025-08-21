@@ -7,6 +7,7 @@
 
 import SwiftUI
 import LocalAuthentication
+import StoreKit
 
 struct SettingsView: View {
     @EnvironmentObject var storeManager: StoreManager
@@ -119,7 +120,7 @@ struct SettingsView: View {
                             .foregroundColor(inkColor.opacity(0.6))
                     }
                     
-                    Link(destination: URL(string: "https://example.com/privacy")!) {
+                    Link(destination: URL(string: "https://abdalla2024.github.io/JournalApp/privacy.html")!) {
                         HStack {
                             Text("Privacy Policy")
                                 .font(.custom("Noteworthy-Light", size: 16))
@@ -131,7 +132,7 @@ struct SettingsView: View {
                     }
                     .foregroundColor(inkColor)
                     
-                    Link(destination: URL(string: "https://example.com/terms")!) {
+                    Link(destination: URL(string: "https://abdalla2024.github.io/JournalApp/terms.html")!) {
                         HStack {
                             Text("Terms of Service")
                                 .font(.custom("Noteworthy-Light", size: 16))
@@ -150,19 +151,19 @@ struct SettingsView: View {
                 
                 // Support Section
                 Section {
-                    Button(action: { }) {
+                    Link(destination: URL(string: "https://abdalla2024.github.io/JournalApp/index.html")!) {
                         HStack {
                             Text("Contact Support")
                                 .font(.custom("Noteworthy-Light", size: 16))
                             Spacer()
-                            Image(systemName: "envelope")
+                            Image(systemName: "arrow.up.right.square")
                                 .font(.system(size: 14))
                                 .foregroundColor(accentColor)
                         }
                     }
                     .foregroundColor(inkColor)
                     
-                    Button(action: { }) {
+                    Button(action: requestAppRating) {
                         HStack {
                             Text("Rate App")
                                 .font(.custom("Noteworthy-Light", size: 16))
@@ -198,6 +199,14 @@ struct SettingsView: View {
         .sheet(isPresented: $showingPaywall) {
             PaywallView(isPresented: $showingPaywall)
                 .environmentObject(storeManager)
+        }
+    }
+    
+    // MARK: - Helper Functions
+    
+    private func requestAppRating() {
+        if let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+            SKStoreReviewController.requestReview(in: scene)
         }
     }
 }

@@ -113,8 +113,18 @@ class QuestionManager: ObservableObject {
             
             // Also update the previous answer for the new day
             fetchPreviousAnswer()
+            
+            // Sync data to widget when day calculation completes
+            if let context = modelContext {
+                SharedDataManager.shared.syncJournalData(from: context)
+            }
         } else {
             print("📅 Same day - no recalculation needed")
+            
+            // Still sync to widget in case there are new entries since last sync
+            if let context = modelContext {
+                SharedDataManager.shared.syncJournalData(from: context)
+            }
         }
     }
     
